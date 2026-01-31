@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer List - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #667eea;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+        }
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            letter-spacing: -0.02em;
+        }
+        .content-actions { display: flex; align-items: center; gap: 0.75rem; }
+        .add-customer-btn {
+            background: #16a34a;
+            color: white;
+            padding: 0.7rem 1.35rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .add-customer-btn:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
+        }
+        .btn-edit {
+            padding: 0.45rem 0.9rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-edit:hover { opacity: 0.9; }
+
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .table th,
+        .table td {
+            padding: 0.875rem 1.25rem;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+        .table th {
+            background: #f7f8fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table td {
+            color: #374151;
+        }
+        .table tbody tr:hover { background: #f7f8fa; }
+
+        /* Cột 1: S/N */
+        .table th:nth-child(1),
+        .table td:nth-child(1) {
+            width: 4rem;
+            text-align: center;
+        }
+        /* Cột 2: Phone */
+        .table th:nth-child(2),
+        .table td:nth-child(2) {
+            width: 10rem;
+            text-align: left;
+        }
+        .phone-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .phone-link:hover { text-decoration: underline; }
+        /* Cột 3: Points */
+        .table th:nth-child(3),
+        .table td:nth-child(3) {
+            width: 7rem;
+            text-align: right;
+        }
+        /* Cột 4: Purchases */
+        .table th:nth-child(4),
+        .table td:nth-child(4) {
+            width: 7rem;
+            text-align: right;
+        }
+        /* Cột 5: Total Amount */
+        .table th:nth-child(5),
+        .table td:nth-child(5) {
+            width: 11rem;
+            text-align: right;
+            font-weight: 500;
+        }
+        /* Cột 6: Discount */
+        .table th:nth-child(6),
+        .table td:nth-child(6) {
+            width: 6rem;
+            text-align: right;
+            font-weight: 500;
+        }
+        /* Cột 7: Actions */
+        .table th:nth-child(7),
+        .table td:nth-child(7) {
+            width: 6rem;
+            text-align: center;
+        }
+
+        /* Customer Modal */
+        .customer-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .customer-modal-overlay.is-open { display: flex; }
+        .customer-modal-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+        }
+        .customer-modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .customer-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a1d21;
+        }
+        .customer-modal-close {
+            width: 36px; height: 36px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .customer-modal-close:hover {
+            background: #e5e7eb;
+            color: #1a1d21;
+        }
+        .customer-modal-body {
+            padding: 1.5rem;
+        }
+        .customer-form .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .customer-form label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+        .customer-form input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #1a1d21;
+            font-family: inherit;
+        }
+        .customer-form input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        .customer-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e8eaed;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        .btn-modal-cancel {
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #dc2626;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .btn-modal-cancel:hover { background: #b91c1c; }
+        .btn-modal-submit {
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #16a34a;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .btn-modal-submit:hover { background: #15803d; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .header { padding: 1rem; }
+            .content { padding: 1rem; }
+            .table-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="ListCustomer.html" class="active">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:16:14 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="content-header">
+                <h1 class="content-title">Customer List</h1>
+                <div class="content-actions">
+                    <a href="#" class="add-customer-btn" id="openAddCustomerModal">+ Add Customer</a>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Phone</th>
+                            <th>Points</th>
+                            <th>Purchases</th>
+                            <th>Total Amount</th>
+                            <th>Discount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><a href="ViewCustomerHistory.html?phone=0901234567" class="phone-link">0901234567</a></td>
+                            <td>1,250</td>
+                            <td>18</td>
+                            <td>2,450,000đ</td>
+                            <td>5%</td>
+                            <td><a href="#" class="btn-edit openUpdateCustomerModal" data-customer-id="1">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><a href="ViewCustomerHistory.html?phone=0912345678" class="phone-link">0912345678</a></td>
+                            <td>820</td>
+                            <td>12</td>
+                            <td>1,180,500đ</td>
+                            <td>3%</td>
+                            <td><a href="#" class="btn-edit openUpdateCustomerModal" data-customer-id="2">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><a href="ViewCustomerHistory.html?phone=0923456789" class="phone-link">0923456789</a></td>
+                            <td>450</td>
+                            <td>7</td>
+                            <td>685,200đ</td>
+                            <td>—</td>
+                            <td><a href="#" class="btn-edit openUpdateCustomerModal" data-customer-id="3">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td><a href="ViewCustomerHistory.html?phone=0934567890" class="phone-link">0934567890</a></td>
+                            <td>2,100</td>
+                            <td>32</td>
+                            <td>4,920,000đ</td>
+                            <td>10%</td>
+                            <td><a href="#" class="btn-edit openUpdateCustomerModal" data-customer-id="4">Edit</a></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td><a href="ViewCustomerHistory.html?phone=0945678901" class="phone-link">0945678901</a></td>
+                            <td>120</td>
+                            <td>3</td>
+                            <td>156,000đ</td>
+                            <td>—</td>
+                            <td><a href="#" class="btn-edit openUpdateCustomerModal" data-customer-id="5">Edit</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div class="customer-modal-overlay" id="addCustomerModal" role="dialog" aria-labelledby="addCustomerModalTitle">
+        <div class="customer-modal-card">
+            <div class="customer-modal-header">
+                <h2 class="customer-modal-title" id="addCustomerModalTitle">Add Customer</h2>
+                <button type="button" class="customer-modal-close" id="closeAddCustomerModal" aria-label="Close">&times;</button>
+            </div>
+            <div class="customer-modal-body">
+                <form class="customer-form" id="addCustomerForm">
+                    <div class="form-group">
+                        <label for="addPhone">Phone</label>
+                        <input type="text" id="addPhone" name="phone" placeholder="e.g. 0901234567">
+                    </div>
+                    <div class="form-group">
+                        <label for="addAmount">Amount</label>
+                        <input type="text" id="addAmount" name="amount" placeholder="e.g. 1,000,000">
+                    </div>
+                </form>
+            </div>
+            <div class="customer-modal-footer">
+                <button type="button" class="btn-modal-cancel" id="cancelAddCustomer">Cancel</button>
+                <button type="button" class="btn-modal-submit" id="submitAddCustomer">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Customer Modal -->
+    <div class="customer-modal-overlay" id="updateCustomerModal" role="dialog" aria-labelledby="updateCustomerModalTitle">
+        <div class="customer-modal-card">
+            <div class="customer-modal-header">
+                <h2 class="customer-modal-title" id="updateCustomerModalTitle">Update Customer</h2>
+                <button type="button" class="customer-modal-close" id="closeUpdateCustomerModal" aria-label="Close">&times;</button>
+            </div>
+            <div class="customer-modal-body">
+                <form class="customer-form" id="updateCustomerForm">
+                    <div class="form-group">
+                        <label for="updatePhone">Phone</label>
+                        <input type="text" id="updatePhone" name="phone" placeholder="e.g. 0901234567">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateAmount">Amount</label>
+                        <input type="text" id="updateAmount" name="amount" placeholder="e.g. 1,000,000">
+                    </div>
+                </form>
+            </div>
+            <div class="customer-modal-footer">
+                <button type="button" class="btn-modal-cancel" id="cancelUpdateCustomer">Cancel</button>
+                <button type="button" class="btn-modal-submit" id="submitUpdateCustomer">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var addModal = document.getElementById('addCustomerModal');
+            var openAddBtn = document.getElementById('openAddCustomerModal');
+            var closeAddBtn = document.getElementById('closeAddCustomerModal');
+            var cancelAddBtn = document.getElementById('cancelAddCustomer');
+            var submitAddBtn = document.getElementById('submitAddCustomer');
+
+            function openAddModal() {
+                addModal.classList.add('is-open');
+            }
+            function closeAddModal() {
+                addModal.classList.remove('is-open');
+            }
+
+            if (openAddBtn) openAddBtn.addEventListener('click', function (e) { e.preventDefault(); openAddModal(); });
+            if (closeAddBtn) closeAddBtn.addEventListener('click', closeAddModal);
+            if (cancelAddBtn) cancelAddBtn.addEventListener('click', closeAddModal);
+            if (submitAddBtn) submitAddBtn.addEventListener('click', function () {
+                closeAddModal();
+            });
+            addModal.addEventListener('click', function (e) {
+                if (e.target === addModal) closeAddModal();
+            });
+
+            var updateModal = document.getElementById('updateCustomerModal');
+            var closeUpdateBtn = document.getElementById('closeUpdateCustomerModal');
+            var cancelUpdateBtn = document.getElementById('cancelUpdateCustomer');
+            var submitUpdateBtn = document.getElementById('submitUpdateCustomer');
+
+            var customersData = {
+                1: { phone: '0901234567', amount: '2,450,000' },
+                2: { phone: '0912345678', amount: '1,180,500' },
+                3: { phone: '0923456789', amount: '685,200' },
+                4: { phone: '0934567890', amount: '4,920,000' },
+                5: { phone: '0945678901', amount: '156,000' }
+            };
+
+            function openUpdateModal(customerId) {
+                var c = customersData[customerId] || customersData[1];
+                document.getElementById('updatePhone').value = c.phone || '';
+                document.getElementById('updateAmount').value = c.amount || '';
+                updateModal.classList.add('is-open');
+            }
+            function closeUpdateModal() {
+                updateModal.classList.remove('is-open');
+            }
+
+            document.querySelectorAll('.openUpdateCustomerModal').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var id = this.getAttribute('data-customer-id') || '1';
+                    openUpdateModal(id);
+                });
+            });
+            if (closeUpdateBtn) closeUpdateBtn.addEventListener('click', closeUpdateModal);
+            if (cancelUpdateBtn) cancelUpdateBtn.addEventListener('click', closeUpdateModal);
+            if (submitUpdateBtn) submitUpdateBtn.addEventListener('click', function () {
+                closeUpdateModal();
+            });
+            updateModal.addEventListener('click', function (e) {
+                if (e.target === updateModal) closeUpdateModal();
+            });
+        })();
+    </script>
+</body>
+</html>

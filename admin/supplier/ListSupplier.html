@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppliers Information - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header .logo {
+            width: 36px;
+            height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 3px solid white;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #16a34a;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #16a34a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+        }
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            letter-spacing: -0.02em;
+        }
+
+        .add-supplier-btn {
+            background: #16a34a;
+            color: white;
+            padding: 0.7rem 1.35rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .add-supplier-btn:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
+        }
+
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+        }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th {
+            background: #f7f8fa;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e8eaed;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+        .table tbody tr:last-child td { border-bottom: none; }
+        .table tbody tr:hover { background: #f7f8fa; }
+
+        .status-badge {
+            padding: 0.3rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 90px;
+        }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-deactive { background: #fee2e2; color: #991b1b; }
+
+        .action-buttons { display: flex; gap: 0.5rem; }
+        .btn {
+            padding: 0.45rem 0.9rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-edit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-delete:hover { background: #b91c1c; }
+
+        .btn-active {
+            background: #14b8a6;
+            color: white;
+        }
+        .btn-active:hover {
+            background: #0d9488;
+            box-shadow: 0 2px 8px rgba(20, 184, 166, 0.35);
+        }
+
+        /* Modal overlay - nền chìm */
+        .supplier-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            z-index: 1000;
+        }
+        .supplier-modal-overlay.is-open { display: flex; }
+        .supplier-modal-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 460px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .supplier-modal-header {
+            padding: 1.35rem 1.5rem;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafbfc;
+        }
+        .supplier-modal-title { font-size: 1.25rem; font-weight: 700; color: #1a1d21; }
+        .supplier-modal-close {
+            width: 36px; height: 36px;
+            border: none; background: transparent; border-radius: 8px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; color: #6b7280; transition: all 0.2s ease;
+        }
+        .supplier-modal-close:hover { background: #e8eaed; color: #1a1d21; }
+        .supplier-modal-body { padding: 1.5rem 1.5rem 1.75rem; }
+        .supplier-form-group { margin-bottom: 1.15rem; }
+        .supplier-form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+        .supplier-form-input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            background: #fff;
+            color: #1a1d21;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .supplier-form-input:focus {
+            outline: none;
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+        }
+        textarea.supplier-form-input { min-height: 80px; resize: vertical; }
+        .supplier-modal-footer {
+            padding: 1.25rem 1.5rem 1.5rem;
+            border-top: 1px solid #e8eaed;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: #fafbfc;
+        }
+        .btn-modal-close {
+            background: #dc2626;
+            color: white;
+            padding: 0.65rem 1.35rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-modal-close:hover { background: #b91c1c; }
+        .btn-modal-submit {
+            background: #14b8a6;
+            color: white;
+            padding: 0.65rem 1.35rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-modal-submit:hover {
+            background: #0d9488;
+            box-shadow: 0 2px 10px rgba(20, 184, 166, 0.35);
+        }
+        .btn-modal-update {
+            background: #16a34a;
+            color: white;
+            padding: 0.65rem 1.35rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-modal-update:hover {
+            background: #15803d;
+            box-shadow: 0 2px 10px rgba(22, 163, 74, 0.35);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .header { padding: 1rem; }
+            .content { padding: 1rem; }
+            .table-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="ListSupplier.html" class="active">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:15:15 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="content-header">
+                <h1 class="content-title">Suppliers Information</h1>
+                <a href="#" class="add-supplier-btn" id="openAddSupplierModal">+ Add Suppliers</a>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>NAME</th>
+                            <th>COMPANY</th>
+                            <th>REGDATE</th>
+                            <th>E-MAIL</th>
+                            <th>PHONE</th>
+                            <th>ADDRESS</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Supplier One</td>
+                            <td>Supplier One Ltd</td>
+                            <td>Wed Jul 12th 2023</td>
+                            <td>supplier@pos.com</td>
+                            <td>3030202</td>
+                            <td>Supplier address</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit open-update-supplier" data-supplier-id="1">Edit</a>
+                                    <a href="#" class="btn btn-delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Supplier Two</td>
+                            <td>ABC Trading Co.</td>
+                            <td>Mon Aug 21st 2023</td>
+                            <td>abc.trading@email.com</td>
+                            <td>0912345678</td>
+                            <td>123 Nguyen Hue, Q1, HCM</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit open-update-supplier" data-supplier-id="2">Edit</a>
+                                    <a href="#" class="btn btn-delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Supplier Three</td>
+                            <td>Global Supplies JSC</td>
+                            <td>Fri Oct 6th 2023</td>
+                            <td>global@supplies.vn</td>
+                            <td>0987654321</td>
+                            <td>45 Le Loi, District 3, HCM</td>
+                            <td><span class="status-badge status-deactive">Deactive</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit open-update-supplier" data-supplier-id="3">Edit</a>
+                                    <a href="#" class="btn btn-active">Active</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Supplier Four</td>
+                            <td>Fast Goods Distribution</td>
+                            <td>Tue Dec 19th 2023</td>
+                            <td>contact@fastgoods.com</td>
+                            <td>02838291234</td>
+                            <td>78 Tran Hung Dao, Q5, HCM</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit open-update-supplier" data-supplier-id="4">Edit</a>
+                                    <a href="#" class="btn btn-delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Supplier Modal - nổi lên trên, nền chìm -->
+    <div class="supplier-modal-overlay" id="addSupplierOverlay" role="dialog" aria-modal="true">
+        <div class="supplier-modal-card" onclick="event.stopPropagation()">
+            <div class="supplier-modal-header">
+                <h2 class="supplier-modal-title">Add Suppliers</h2>
+                <button type="button" class="supplier-modal-close" aria-label="Close" id="closeAddSupplierModal">&times;</button>
+            </div>
+            <form class="supplier-modal-body" id="addSupplierForm">
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="addSupplierName">Supplier Name</label>
+                    <input type="text" id="addSupplierName" class="supplier-form-input" placeholder="Supplier Name" required>
+                </div>
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="addCompanyName">Company Name</label>
+                    <input type="text" id="addCompanyName" class="supplier-form-input" placeholder="Company Name" required>
+                </div>
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="addSupplierEmail">Supplier e-Mail</label>
+                    <input type="email" id="addSupplierEmail" class="supplier-form-input" placeholder="Enter Company e-mail..." required>
+                </div>
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="addSupplierPhone">Supplier Phone</label>
+                    <input type="text" id="addSupplierPhone" class="supplier-form-input" placeholder="Enter Company phone..." required>
+                </div>
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="addSupplierAddress">Supplier Address</label>
+                    <textarea id="addSupplierAddress" class="supplier-form-input" placeholder="Enter Company address..." rows="3"></textarea>
+                </div>
+            </form>
+            <div class="supplier-modal-footer">
+                <button type="button" class="btn-modal-close" id="closeAddSupplierBtn">Close</button>
+                <button type="submit" form="addSupplierForm" class="btn-modal-submit">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Supplier Modal - nổi lên trên, nền chìm -->
+    <div class="supplier-modal-overlay" id="updateSupplierOverlay" role="dialog" aria-modal="true">
+        <div class="supplier-modal-card" onclick="event.stopPropagation()">
+            <div class="supplier-modal-header">
+                <h2 class="supplier-modal-title">Update Supplier</h2>
+                <button type="button" class="supplier-modal-close" aria-label="Close" id="closeUpdateSupplierModal">&times;</button>
+            </div>
+            <form class="supplier-modal-body" id="updateSupplierForm">
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="updateSupplierName">Supplier Name</label>
+                    <input type="text" id="updateSupplierName" class="supplier-form-input" placeholder="Supplier Name" required>
+                </div>
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="updateCompany">Company</label>
+                    <input type="text" id="updateCompany" class="supplier-form-input" placeholder="Company" required>
+                </div>
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="updateEmail">Email</label>
+                    <input type="email" id="updateEmail" class="supplier-form-input" placeholder="Email" required>
+                </div>
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="updatePhone">Phone</label>
+                    <input type="text" id="updatePhone" class="supplier-form-input" placeholder="Phone" required>
+                </div>
+                <div class="supplier-form-group">
+                    <label class="supplier-form-label" for="updateAddress">Address</label>
+                    <textarea id="updateAddress" class="supplier-form-input" placeholder="Address" rows="3"></textarea>
+                </div>
+            </form>
+            <div class="supplier-modal-footer">
+                <button type="button" class="btn-modal-close" id="closeUpdateSupplierBtn">Close</button>
+                <button type="submit" form="updateSupplierForm" class="btn-modal-update">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var supplierData = {
+            '1': { name: 'Supplier One', company: 'Supplier One Ltd', email: 'supplier@pos.com', phone: '3030202', address: 'Supplier address' },
+            '2': { name: 'Supplier Two', company: 'ABC Trading Co.', email: 'abc.trading@email.com', phone: '0912345678', address: '123 Nguyen Hue, Q1, HCM' },
+            '3': { name: 'Supplier Three', company: 'Global Supplies JSC', email: 'global@supplies.vn', phone: '0987654321', address: '45 Le Loi, District 3, HCM' },
+            '4': { name: 'Supplier Four', company: 'Fast Goods Distribution', email: 'contact@fastgoods.com', phone: '02838291234', address: '78 Tran Hung Dao, Q5, HCM' }
+        };
+
+        document.getElementById('openAddSupplierModal').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('addSupplierName').value = '';
+            document.getElementById('addCompanyName').value = '';
+            document.getElementById('addSupplierEmail').value = '';
+            document.getElementById('addSupplierPhone').value = '';
+            document.getElementById('addSupplierAddress').value = '';
+            document.getElementById('addSupplierOverlay').classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeAddSupplierModal() {
+            document.getElementById('addSupplierOverlay').classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('closeAddSupplierModal').addEventListener('click', closeAddSupplierModal);
+        document.getElementById('closeAddSupplierBtn').addEventListener('click', closeAddSupplierModal);
+        document.getElementById('addSupplierOverlay').addEventListener('click', function (e) {
+            if (e.target === document.getElementById('addSupplierOverlay')) closeAddSupplierModal();
+        });
+        document.getElementById('addSupplierForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            closeAddSupplierModal();
+        });
+
+        document.querySelectorAll('.open-update-supplier').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var id = this.getAttribute('data-supplier-id');
+                var s = supplierData[id];
+                if (!s) return;
+                document.getElementById('updateSupplierName').value = s.name;
+                document.getElementById('updateCompany').value = s.company;
+                document.getElementById('updateEmail').value = s.email;
+                document.getElementById('updatePhone').value = s.phone;
+                document.getElementById('updateAddress').value = s.address;
+                document.getElementById('updateSupplierOverlay').classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        function closeUpdateSupplierModal() {
+            document.getElementById('updateSupplierOverlay').classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+        document.getElementById('closeUpdateSupplierModal').addEventListener('click', closeUpdateSupplierModal);
+        document.getElementById('closeUpdateSupplierBtn').addEventListener('click', closeUpdateSupplierModal);
+        document.getElementById('updateSupplierOverlay').addEventListener('click', function (e) {
+            if (e.target === document.getElementById('updateSupplierOverlay')) closeUpdateSupplierModal();
+        });
+        document.getElementById('updateSupplierForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            closeUpdateSupplierModal();
+        });
+    </script>
+</body>
+</html>

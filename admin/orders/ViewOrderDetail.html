@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Detail - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #0d9488;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #1e293b;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #0d9488;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            margin-bottom: 1.5rem;
+        }
+
+        .bill-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8eaed;
+            padding: 2rem;
+            max-width: 560px;
+        }
+        .bill-info {
+            margin-bottom: 1.5rem;
+        }
+        .bill-info-row {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        .bill-info-row strong {
+            color: #1a1d21;
+            min-width: 220px;
+            display: inline-block;
+        }
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.25rem;
+        }
+        .bill-table th,
+        .bill-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 0.9rem;
+        }
+        .bill-table th {
+            background: #f7f8fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .bill-table td:nth-child(2) { text-align: right; }
+        .bill-table td:nth-child(3) { text-align: right; font-weight: 500; }
+        .bill-table .unit-price-cell {
+            color: #374151;
+        }
+        .bill-summary {
+            border-top: 2px solid #e8eaed;
+            padding-top: 1rem;
+        }
+        .bill-summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+            color: #374151;
+        }
+        .bill-summary-row.total-payment {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1a1d21;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e8eaed;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .header { padding: 1rem; }
+            .content { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="ViewAllOrder.html" class="active">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:17:23 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <a href="ViewAllOrder.html" class="back-link">← Back to Orders List</a>
+            <h1 class="content-title">Order Detail</h1>
+
+            <div class="bill-card">
+                <div class="bill-info">
+                    <div class="bill-info-row">
+                        <strong>Số điện thoại khách hàng (nếu có):</strong>
+                        <span id="customerPhone">—</span>
+                    </div>
+                    <div class="bill-info-row">
+                        <strong>Nhân viên bán hàng:</strong>
+                        <span id="cashier">—</span>
+                    </div>
+                </div>
+
+                <table class="bill-table">
+                    <thead>
+                        <tr>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderItems">
+                    </tbody>
+                </table>
+
+                <div class="bill-summary">
+                    <div class="bill-summary-row">
+                        <span>Tổng tiền hàng</span>
+                        <span id="subtotal">—</span>
+                    </div>
+                    <div class="bill-summary-row">
+                        <span>Giảm giá</span>
+                        <span id="discount">—</span>
+                    </div>
+                    <div class="bill-summary-row total-payment">
+                        <span>Tổng thanh toán</span>
+                        <span id="totalPayment">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var orders = {
+                1: {
+                    customerPhone: '0901234567',
+                    cashier: 'John',
+                    items: [
+                        { name: 'Dưa hấu', unitPrice: 10000, qty: 2, amount: 20000 },
+                        { name: 'Bánh mì', unitPrice: 15000, qty: 3, amount: 45000 },
+                        { name: 'Sữa tươi', unitPrice: 20000, qty: 3, amount: 60000 }
+                    ],
+                    subtotal: 125000,
+                    discountPercent: 5,
+                    discountAmount: 6250,
+                    totalPayment: 118750
+                },
+                2: {
+                    customerPhone: '0987463212',
+                    cashier: 'Jane',
+                    items: [
+                        { name: 'Cà phê đen', unitPrice: 25000, qty: 2, amount: 50000 },
+                        { name: 'Bánh ngọt', unitPrice: 17700, qty: 2, amount: 35400 }
+                    ],
+                    subtotal: 85400,
+                    discountPercent: 0,
+                    discountAmount: 0,
+                    totalPayment: 85400
+                },
+                3: {
+                    customerPhone: null,
+                    cashier: 'John',
+                    items: [
+                        { name: 'Áo thun', unitPrice: 150000, qty: 1, amount: 150000 },
+                        { name: 'Nước ngọt', unitPrice: 10000, qty: 4, amount: 40000 }
+                    ],
+                    subtotal: 250000,
+                    discountPercent: 10,
+                    discountAmount: 25000,
+                    totalPayment: 225000
+                },
+                4: {
+                    customerPhone: '0923456789',
+                    cashier: 'Jane',
+                    items: [
+                        { name: 'Tập vở', unitPrice: 8500, qty: 2, amount: 17000 },
+                        { name: 'Bút bi', unitPrice: 4700, qty: 6, amount: 28200 }
+                    ],
+                    subtotal: 45200,
+                    discountPercent: 3,
+                    discountAmount: 1356,
+                    totalPayment: 43844
+                }
+            };
+
+            function formatMoney(n) {
+                return new Intl.NumberFormat('vi-VN').format(n) + 'đ';
+            }
+
+            var params = new URLSearchParams(window.location.search);
+            var id = params.get('id') || '1';
+            var order = orders[id] || orders[1];
+
+            document.getElementById('customerPhone').textContent = order.customerPhone || '—';
+            document.getElementById('cashier').textContent = order.cashier || '—';
+
+            var tbody = document.getElementById('orderItems');
+            tbody.innerHTML = '';
+            order.items.forEach(function (item) {
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td class="unit-price-cell">(' + item.name + ' - ' + formatMoney(item.unitPrice) + ')</td>' +
+                    '<td>' + item.qty + '</td>' +
+                    '<td>' + formatMoney(item.amount) + '</td>';
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('subtotal').textContent = formatMoney(order.subtotal);
+            document.getElementById('discount').textContent = order.discountPercent
+                ? order.discountPercent + '% (' + formatMoney(order.discountAmount) + ')'
+                : '0đ';
+            document.getElementById('totalPayment').textContent = formatMoney(order.totalPayment);
+        })();
+    </script>
+</body>
+</html>

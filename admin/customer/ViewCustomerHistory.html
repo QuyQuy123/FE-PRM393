@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Order History - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #667eea;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+        .content-title .phone { color: #667eea; font-weight: 700; }
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .table th,
+        .table td {
+            padding: 0.875rem 1rem;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+        .table th {
+            background: #f7f8fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table td { color: #374151; }
+        .table tbody tr:hover { background: #f7f8fa; }
+        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; width: 7rem; }
+        .table th:nth-child(2), .table td:nth-child(2) { text-align: left; width: 11rem; }
+        .table th:nth-child(3), .table td:nth-child(3) { text-align: right; width: 7rem; }
+        .table th:nth-child(4), .table td:nth-child(4) { text-align: center; width: 5rem; }
+        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; width: 8rem; }
+        .table th:nth-child(6), .table td:nth-child(6) { text-align: left; width: 6rem; }
+        .table th:nth-child(7), .table td:nth-child(7) { text-align: left; width: 5rem; }
+        .table th:nth-child(8), .table td:nth-child(8) { text-align: center; width: 5rem; }
+        .status-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-paid { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .btn-view {
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-view:hover { opacity: 0.9; }
+        .no-orders {
+            padding: 2rem;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .header { padding: 1rem; }
+            .content { padding: 1rem; }
+            .table-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="ListCustomer.html" class="active">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:17:23 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <a href="ListCustomer.html" class="back-link">← Back to Customer List</a>
+            <h1 class="content-title">Customer Order History – <span class="phone" id="pagePhone">—</span></h1>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date/Time</th>
+                            <th>Total</th>
+                            <th>Discount (%)</th>
+                            <th>Payable</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderHistoryBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var ordersByPhone = {
+                '0901234567': [
+                    { orderId: 'ORD-101', dateTime: '10:15 AM, 02/01/2025', total: '250,000đ', discount: 5, payable: '237,500đ', payment: 'Cash', status: 'Paid', statusClass: 'status-paid', detailId: 1 },
+                    { orderId: 'ORD-105', dateTime: '14:20, 05/01/2025', total: '180,000đ', discount: 0, payable: '180,000đ', payment: 'Transfer', status: 'Paid', statusClass: 'status-paid', detailId: 2 },
+                    { orderId: 'ORD-108', dateTime: '09:00 AM, 08/01/2025', total: '420,000đ', discount: 10, payable: '378,000đ', payment: 'POS', status: 'Paid', statusClass: 'status-paid', detailId: 3 }
+                ],
+                '0912345678': [
+                    { orderId: 'ORD-102', dateTime: '11:30, 03/01/2025', total: '85,400đ', discount: 0, payable: '85,400đ', payment: 'Cash', status: 'Paid', statusClass: 'status-paid', detailId: 2 },
+                    { orderId: 'ORD-106', dateTime: '16:45, 06/01/2025', total: '310,000đ', discount: 5, payable: '294,500đ', payment: 'Transfer', status: 'Paid', statusClass: 'status-paid', detailId: 4 },
+                    { orderId: 'ORD-109', dateTime: '10:00 AM, 09/01/2025', total: '95,000đ', discount: 3, payable: '92,150đ', payment: 'Cash', status: 'Pending', statusClass: 'status-pending', detailId: 1 }
+                ],
+                '0923456789': [
+                    { orderId: 'ORD-103', dateTime: '09:00 AM, 04/01/2025', total: '189,000đ', discount: 10, payable: '170,100đ', payment: 'POS', status: 'Pending', statusClass: 'status-pending', detailId: 3 },
+                    { orderId: 'ORD-107', dateTime: '13:15, 07/01/2025', total: '45,200đ', discount: 3, payable: '43,844đ', payment: 'Transfer', status: 'Paid', statusClass: 'status-paid', detailId: 4 }
+                ],
+                '0934567890': [
+                    { orderId: 'ORD-104', dateTime: '16:45, 05/01/2025', total: '43,844đ', discount: 3, payable: '42,529đ', payment: 'Transfer', status: 'Paid', statusClass: 'status-paid', detailId: 4 },
+                    { orderId: 'ORD-110', dateTime: '11:20 AM, 10/01/2025', total: '520,000đ', discount: 5, payable: '494,000đ', payment: 'POS', status: 'Paid', statusClass: 'status-paid', detailId: 1 },
+                    { orderId: 'ORD-111', dateTime: '15:00, 12/01/2025', total: '156,000đ', discount: 0, payable: '156,000đ', payment: 'Cash', status: 'Paid', statusClass: 'status-paid', detailId: 2 }
+                ],
+                '0945678901': [
+                    { orderId: 'ORD-112', dateTime: '08:30 AM, 01/01/2025', total: '78,000đ', discount: 0, payable: '78,000đ', payment: 'Cash', status: 'Paid', statusClass: 'status-paid', detailId: 1 },
+                    { orderId: 'ORD-113', dateTime: '14:00, 03/01/2025', total: '45,000đ', discount: 0, payable: '45,000đ', payment: 'Cash', status: 'Paid', statusClass: 'status-paid', detailId: 3 }
+                ]
+            };
+
+            var params = new URLSearchParams(window.location.search);
+            var phone = params.get('phone') || '';
+
+            document.getElementById('pagePhone').textContent = phone || '—';
+
+            var tbody = document.getElementById('orderHistoryBody');
+            var orders = ordersByPhone[phone] || [];
+
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="no-orders">No orders found for this phone number.</td></tr>';
+            } else {
+                orders.forEach(function (o) {
+                    var tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td>' + o.orderId + '</td>' +
+                        '<td>' + o.dateTime + '</td>' +
+                        '<td>' + o.total + '</td>' +
+                        '<td>' + (o.discount || '—') + '</td>' +
+                        '<td>' + o.payable + '</td>' +
+                        '<td>' + o.payment + '</td>' +
+                        '<td><span class="status-badge ' + o.statusClass + '">' + o.status + '</span></td>' +
+                        '<td><a href="../orders/ViewOrderDetail.html?id=' + (o.detailId || 1) + '" class="btn-view">View</a></td>';
+                    tbody.appendChild(tr);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

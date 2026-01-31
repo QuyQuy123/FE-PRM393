@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-left {
+            background: #facc15;
+            color: #1a1d21;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #16a34a;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #1e293b;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .report-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .report-title-icon {
+            width: 40px;
+            height: 40px;
+            background: #e0e7ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4f46e5;
+        }
+        .report-title-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+        .report-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            letter-spacing: -0.02em;
+        }
+        .payment-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+        .payment-card {
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .payment-card.cash { background: #16a34a; }
+        .payment-card.transfer { background: #dc2626; }
+        .payment-card.pos { background: #eab308; color: #1a1d21; }
+        .payment-card.cheque { background: #38bdf8; }
+        .payment-card-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .payment-card.pos .payment-card-icon { background: rgba(0, 0, 0, 0.15); }
+        .payment-card-label { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .payment-card-amount { font-size: 1.25rem; font-weight: 700; }
+        .filter-section {
+            margin-bottom: 1.5rem;
+        }
+        .filter-hint {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+        }
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .filter-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .filter-group input,
+        .filter-group select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 140px;
+        }
+        .btn-search {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #1a1d21;
+            color: white;
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-search:hover { background: #374151; }
+        .btn-export-excel {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #16a34a;
+            color: white;
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-export-excel:hover { background: #15803d; }
+        .total-revenue {
+            margin-top: 1rem;
+            padding: 1rem 1.25rem;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #166534;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .total-revenue-label { font-weight: 600; }
+        .total-revenue-amount { font-size: 1.25rem; }
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .table th,
+        .table td {
+            padding: 0.875rem 1rem;
+            vertical-align: middle;
+            font-size: 0.875rem;
+        }
+        .table th {
+            background: #f7f8fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table td { color: #374151; }
+        .table tbody tr:hover { background: #f7f8fa; }
+        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; width: 6rem; }
+        .table th:nth-child(2), .table td:nth-child(2) { text-align: left; width: 10rem; max-width: 10rem; }
+        .table th:nth-child(3), .table td:nth-child(3) { text-align: right; width: 7rem; }
+        .table th:nth-child(4), .table td:nth-child(4) { text-align: center; width: 5rem; }
+        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; width: 8rem; }
+        .table th:nth-child(6), .table td:nth-child(6) { text-align: left; width: 6rem; }
+        .table th:nth-child(7), .table td:nth-child(7) { text-align: left; width: 5rem; }
+        .table th:nth-child(8), .table td:nth-child(8) { text-align: left; width: 5rem; }
+
+        @media (max-width: 1024px) {
+            .payment-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .header { padding: 1rem; flex-wrap: wrap; }
+            .content { padding: 1rem; }
+            .payment-cards { grid-template-columns: 1fr; }
+            .filter-row { flex-direction: column; align-items: flex-start; }
+            .table-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="report.html" class="active">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-left">POS (Point Of Sales) v3.0</div>
+            <div class="header-right">
+                <div class="time-badge">11:17:25 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="report-title-wrap">
+                <div class="report-title-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 17v-2a2 2 0 012-2h2V9H5a2 2 0 01-2-2V5a2 2 0 012-2h2v2H5v2h2v6H5a2 2 0 01-2 2z"/>
+                        <path d="M9 21h6v-2H9v2zm0-4h6v-2H9v2zm0-4h6v-2H9v2z"/>
+                        <path d="M13 3h2a2 2 0 012 2v2h-2V5h-2V3z"/>
+                        <path d="M19 7h2v2h-2z"/>
+                        <path d="M19 11h2v6a2 2 0 01-2 2h-2v-2h2v-6z"/>
+                    </svg>
+                </div>
+                <h1 class="report-title">Sales Report for the Month of July, 2025</h1>
+            </div>
+
+            <div class="payment-cards">
+                <div class="payment-card cash">
+                    <div class="payment-card-icon">₦</div>
+                    <div>
+                        <div class="payment-card-label">Cash Payment</div>
+                        <div class="payment-card-amount">0đ</div>
+                    </div>
+                </div>
+                <div class="payment-card transfer">
+                    <div class="payment-card-icon">⇄</div>
+                    <div>
+                        <div class="payment-card-label">Transfer Payment</div>
+                        <div class="payment-card-amount">0đ</div>
+                    </div>
+                </div>
+                <div class="payment-card pos">
+                    <div class="payment-card-icon">💳</div>
+                    <div>
+                        <div class="payment-card-label">POS Payment</div>
+                        <div class="payment-card-amount">0đ</div>
+                    </div>
+                </div>
+                <div class="payment-card cheque">
+                    <div class="payment-card-icon">📄</div>
+                    <div>
+                        <div class="payment-card-label">Cheque Payment</div>
+                        <div class="payment-card-amount">0đ</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <p class="filter-hint">You can filter sales record by date range</p>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="fromDate">FROM</label>
+                        <input type="text" id="fromDate" placeholder="dd/mm/yyyy" value="01/01/2025">
+                    </div>
+                    <div class="filter-group">
+                        <label for="toDate">TO</label>
+                        <input type="text" id="toDate" placeholder="dd/mm/yyyy" value="08/01/2025">
+                    </div>
+                    <div class="filter-group">
+                        <label for="paymentType">Payment</label>
+                        <select id="paymentType">
+                            <option>All Payments</option>
+                            <option>Cash</option>
+                            <option>Transfer</option>
+                            <option>POS</option>
+                            <option>Cheque</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-search">🔍 Search Record</button>
+                    <button type="button" class="btn-export-excel">📊 Export Excel</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Phone/Email</th>
+                            <th>Total</th>
+                            <th>Discount (%)</th>
+                            <th>Payable</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Cashier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ORD-101</td>
+                            <td>0901234567</td>
+                            <td>250,000đ</td>
+                            <td>5</td>
+                            <td>237,500đ</td>
+                            <td>Cash</td>
+                            <td>Paid</td>
+                            <td>John</td>
+                        </tr>
+                        <tr>
+                            <td>ORD-102</td>
+                            <td>user@mail.com</td>
+                            <td>180,000đ</td>
+                            <td>0</td>
+                            <td>180,000đ</td>
+                            <td>Transfer</td>
+                            <td>Paid</td>
+                            <td>Jane</td>
+                        </tr>
+                        <tr>
+                            <td>ORD-103</td>
+                            <td>0912345678</td>
+                            <td>420,000đ</td>
+                            <td>10</td>
+                            <td>378,000đ</td>
+                            <td>POS</td>
+                            <td>Paid</td>
+                            <td>John</td>
+                        </tr>
+                        <tr>
+                            <td>ORD-104</td>
+                            <td>0923456789</td>
+                            <td>95,000đ</td>
+                            <td>3</td>
+                            <td>92,150đ</td>
+                            <td>Cash</td>
+                            <td>Paid</td>
+                            <td>Jane</td>
+                        </tr>
+                        <tr>
+                            <td>ORD-105</td>
+                            <td>0934567890</td>
+                            <td>310,000đ</td>
+                            <td>5</td>
+                            <td>294,500đ</td>
+                            <td>Transfer</td>
+                            <td>Paid</td>
+                            <td>John</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="total-revenue">
+                <span class="total-revenue-label">Tổng doanh thu</span>
+                <span class="total-revenue-amount" id="totalRevenue">1,182,150đ</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

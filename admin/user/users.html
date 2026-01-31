@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Information - POS System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header .logo {
+            width: 36px;
+            height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0.75rem 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 3px solid white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .time-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-details {
+            font-size: 0.9rem;
+        }
+
+        .user-details .name {
+            font-weight: 600;
+            color: #1a1d21;
+        }
+
+        .user-details .role {
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-top: 1px;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 2rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            letter-spacing: -0.02em;
+        }
+
+        .add-user-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.7rem 1.35rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-user-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Table */
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: #f7f8fa;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e8eaed;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tbody tr:hover {
+            background: #f7f8fa;
+        }
+
+        .user-name-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .user-name-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.3rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 90px;
+        }
+
+        .status-administrator {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-user {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Account Status Badges */
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-deactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-waiting {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.45rem 0.9rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #b91c1c;
+        }
+
+        .btn-active {
+            background: #14b8a6;
+            color: white;
+        }
+
+        .btn-active:hover {
+            background: #0d9488;
+            box-shadow: 0 2px 8px rgba(20, 184, 166, 0.35);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 240px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+
+        /* Add User Modal */
+        .add-user-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            z-index: 1000;
+        }
+
+        .add-user-modal-overlay.is-open {
+            display: flex;
+        }
+
+        .add-user-modal-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 460px;
+            overflow: hidden;
+        }
+
+        .add-user-modal-header {
+            padding: 1.35rem 1.5rem;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafbfc;
+        }
+
+        .add-user-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a1d21;
+        }
+
+        .add-user-modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #6b7280;
+            transition: all 0.2s ease;
+        }
+
+        .add-user-modal-close:hover {
+            background: #e8eaed;
+            color: #1a1d21;
+        }
+
+        .add-user-modal-body {
+            padding: 1.5rem 1.5rem 1.75rem;
+        }
+
+        .add-user-form-group {
+            margin-bottom: 1.15rem;
+        }
+
+        .add-user-form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+
+        .add-user-form-input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            font-size: 0.95rem;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            background: #fff;
+            color: #1a1d21;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .add-user-form-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .add-user-form-input:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+        }
+
+        .add-user-form-input.optional-hint {
+            font-size: 0.9rem;
+        }
+
+        select.add-user-form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        .add-user-checkbox-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .add-user-checkbox-wrap input {
+            width: 18px;
+            height: 18px;
+            accent-color: #14b8a6;
+            cursor: pointer;
+        }
+
+        .add-user-checkbox-wrap label {
+            cursor: pointer;
+        }
+
+        .add-user-optional-label::after {
+            content: " (có thể để trống)";
+            font-weight: 400;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .add-user-modal-footer {
+            padding: 1.25rem 1.5rem 1.5rem;
+            border-top: 1px solid #e8eaed;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: #fafbfc;
+        }
+
+        .add-user-btn-dismiss {
+            background: #dc2626;
+            color: white;
+            padding: 0.65rem 1.35rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .add-user-btn-dismiss:hover {
+            background: #b91c1c;
+        }
+
+        .add-user-btn-create {
+            background: #14b8a6;
+            color: white;
+            padding: 0.65rem 1.35rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .add-user-btn-create:hover {
+            background: #0d9488;
+            box-shadow: 0 2px 10px rgba(20, 184, 166, 0.35);
+        }
+
+        /* Update User Modal - cùng style với Add User, nổi lên trên */
+        .update-user-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            z-index: 1000;
+        }
+
+        .update-user-modal-overlay.is-open {
+            display: flex;
+        }
+
+        .update-user-modal-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 460px;
+            overflow: hidden;
+        }
+
+        .update-user-modal-header {
+            padding: 1.35rem 1.5rem;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafbfc;
+        }
+
+        .update-user-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a1d21;
+        }
+
+        .update-user-modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #6b7280;
+            transition: all 0.2s ease;
+        }
+
+        .update-user-modal-close:hover {
+            background: #e8eaed;
+            color: #1a1d21;
+        }
+
+        .update-user-modal-body {
+            padding: 1.5rem 1.5rem 1.75rem;
+        }
+
+        .update-user-modal-body .add-user-form-group {
+            margin-bottom: 1.15rem;
+        }
+
+        .update-user-modal-footer {
+            padding: 1.25rem 1.5rem 1.5rem;
+            border-top: 1px solid #e8eaed;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: #fafbfc;
+        }
+
+        .add-user-btn-update {
+            background: #14b8a6;
+            color: white;
+            padding: 0.65rem 1.35rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .add-user-btn-update:hover {
+            background: #0d9488;
+            box-shadow: 0 2px 10px rgba(20, 184, 166, 0.35);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="#" class="active">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:14:36 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="content-header">
+                <h1 class="content-title">User Information</h1>
+                <a href="#" class="add-user-btn" id="openAddUserModal">
+                    <span>+</span> Add User
+                </a>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>NAME</th>
+                            <th>USERNAME</th>
+                            <th>E-MAIL</th>
+                            <th>ROLE</th>
+                            <th>STATUS</th>
+                            <th>ID CARD</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><a href="ViewUserDetail.html?id=1" class="user-name-link">Kode Made Eazy</a></td>
+                            <td>kodemade</td>
+                            <td>admin@kode.com</td>
+                            <td><span class="status-badge status-administrator">Administrator</span></td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>123456789012</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit open-update-modal" data-user-id="1">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><a href="ViewUserDetail.html?id=2" class="user-name-link">John Smith</a></td>
+                            <td>jsmith</td>
+                            <td>john@pos.com</td>
+                            <td><span class="status-badge status-user">User</span></td>
+                            <td><span class="status-badge status-deactive">Deactive</span></td>
+                            <td>987654321098</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit open-update-modal" data-user-id="2">Edit</a>
+                                    <a href="#" class="btn btn-active">Active</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><a href="ViewUserDetail.html?id=3" class="user-name-link">Sarah Johnson</a></td>
+                            <td>sjohnson</td>
+                            <td>sarah@pos.com</td>
+                            <td><span class="status-badge status-user">User</span></td>
+                            <td><span class="status-badge status-waiting">Waiting</span></td>
+                            <td>456789123456</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit open-update-modal" data-user-id="3">Edit</a>
+                                    <a href="#" class="btn btn-delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal (nổi lên trên) -->
+    <div class="add-user-modal-overlay" id="addUserModalOverlay" role="dialog" aria-modal="true" aria-labelledby="addUserModalTitle">
+        <div class="add-user-modal-card" id="addUserModalCard" onclick="event.stopPropagation()">
+            <div class="add-user-modal-header">
+                <h2 class="add-user-modal-title" id="addUserModalTitle">Create User Account</h2>
+                <button type="button" class="add-user-modal-close" aria-label="Close" id="closeAddUserModal">&times;</button>
+            </div>
+
+            <form class="add-user-modal-body" id="addUserForm">
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="modalFullname">Fullname</label>
+                    <input type="text" id="modalFullname" name="fullname" class="add-user-form-input" placeholder="Enter name" required>
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="modalUsername">Username</label>
+                    <input type="text" id="modalUsername" name="username" class="add-user-form-input" placeholder="Enter Username" required>
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="modalEmail">e-Mail</label>
+                    <input type="email" id="modalEmail" name="email" class="add-user-form-input" placeholder="Enter e-mail..." required>
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="modalPassword">Password</label>
+                    <input type="password" id="modalPassword" name="password" class="add-user-form-input" placeholder="Enter password" required>
+                    <div class="add-user-checkbox-wrap">
+                        <input type="checkbox" id="modalShowPassword" onchange="toggleModalPassword()">
+                        <label for="modalShowPassword">Show password</label>
+                    </div>
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label add-user-optional-label" for="modalIdCard">ID Card</label>
+                    <input type="text" id="modalIdCard" name="idCard" class="add-user-form-input optional-hint" placeholder="Enter ID card (optional)" maxlength="12" pattern="[0-9]*" inputmode="numeric">
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="modalUserRole">User Role</label>
+                    <select id="modalUserRole" name="userRole" class="add-user-form-input" required>
+                        <option value="">Choose User Role..</option>
+                        <option value="administrator">Administrator</option>
+                        <option value="user">User</option>
+                    </select>
+                </div>
+            </form>
+
+            <div class="add-user-modal-footer">
+                <button type="button" class="add-user-btn-dismiss" id="dismissAddUserModal">Dismiss</button>
+                <button type="submit" form="addUserForm" class="add-user-btn-create">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update User Modal (nổi lên trên, giống Add User) -->
+    <div class="update-user-modal-overlay" id="updateUserModalOverlay" role="dialog" aria-modal="true" aria-labelledby="updateUserModalTitle">
+        <div class="update-user-modal-card" id="updateUserModalCard" onclick="event.stopPropagation()">
+            <div class="update-user-modal-header">
+                <h2 class="update-user-modal-title" id="updateUserModalTitle">Update User Account</h2>
+                <button type="button" class="update-user-modal-close" aria-label="Close" id="closeUpdateUserModal">&times;</button>
+            </div>
+
+            <form class="update-user-modal-body" id="updateUserForm">
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="updateModalFullname">Fullname</label>
+                    <input type="text" id="updateModalFullname" class="add-user-form-input" placeholder="Enter name" required>
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="updateModalUsername">Username</label>
+                    <input type="text" id="updateModalUsername" class="add-user-form-input" placeholder="Enter Username" required>
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="updateModalEmail">e-Mail</label>
+                    <input type="email" id="updateModalEmail" class="add-user-form-input" placeholder="Enter e-mail..." required>
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label add-user-optional-label" for="updateModalPassword">Password</label>
+                    <input type="password" id="updateModalPassword" class="add-user-form-input" placeholder="Leave blank to keep current">
+                    <div class="add-user-checkbox-wrap">
+                        <input type="checkbox" id="updateModalShowPassword" onchange="toggleUpdateModalPassword()">
+                        <label for="updateModalShowPassword">Show password</label>
+                    </div>
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label add-user-optional-label" for="updateModalIdCard">ID Card</label>
+                    <input type="text" id="updateModalIdCard" class="add-user-form-input optional-hint" placeholder="Enter ID card (optional)" maxlength="12" pattern="[0-9]*" inputmode="numeric">
+                </div>
+                <div class="add-user-form-group">
+                    <label class="add-user-form-label" for="updateModalUserRole">User Role</label>
+                    <select id="updateModalUserRole" class="add-user-form-input" required>
+                        <option value="">Choose User Role..</option>
+                        <option value="administrator">Administrator</option>
+                        <option value="user">User</option>
+                    </select>
+                </div>
+            </form>
+
+            <div class="update-user-modal-footer">
+                <button type="button" class="add-user-btn-dismiss" id="dismissUpdateUserModal">Cancel</button>
+                <button type="submit" form="updateUserForm" class="add-user-btn-update">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var addUserOverlay = document.getElementById('addUserModalOverlay');
+        var addUserCard = document.getElementById('addUserModalCard');
+
+        document.getElementById('openAddUserModal').addEventListener('click', function (e) {
+            e.preventDefault();
+            addUserOverlay.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeAddUserModal() {
+            addUserOverlay.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('closeAddUserModal').addEventListener('click', closeAddUserModal);
+        document.getElementById('dismissAddUserModal').addEventListener('click', closeAddUserModal);
+
+        addUserOverlay.addEventListener('click', function (e) {
+            if (e.target === addUserOverlay) closeAddUserModal();
+        });
+
+        function toggleModalPassword() {
+            var el = document.getElementById('modalPassword');
+            var chk = document.getElementById('modalShowPassword');
+            el.type = chk.checked ? 'text' : 'password';
+        }
+
+        document.getElementById('addUserForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            closeAddUserModal();
+        });
+
+        // Update User Modal - data cứng
+        var updateUserData = {
+            '1': { fullname: 'Kode Made Eazy', username: 'kodemade', email: 'admin@kode.com', idCard: '123456789012', userRole: 'administrator' },
+            '2': { fullname: 'John Smith', username: 'jsmith', email: 'john@pos.com', idCard: '987654321098', userRole: 'user' },
+            '3': { fullname: 'Sarah Johnson', username: 'sjohnson', email: 'sarah@pos.com', idCard: '456789123456', userRole: 'user' }
+        };
+
+        var updateUserOverlay = document.getElementById('updateUserModalOverlay');
+
+        function openUpdateUserModal(userId) {
+            var user = updateUserData[userId];
+            if (!user) return;
+            document.getElementById('updateModalFullname').value = user.fullname;
+            document.getElementById('updateModalUsername').value = user.username;
+            document.getElementById('updateModalEmail').value = user.email;
+            document.getElementById('updateModalPassword').value = '';
+            document.getElementById('updateModalIdCard').value = user.idCard || '';
+            document.getElementById('updateModalUserRole').value = user.userRole;
+            updateUserOverlay.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUpdateUserModal() {
+            updateUserOverlay.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+
+        document.querySelectorAll('.open-update-modal').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                openUpdateUserModal(this.getAttribute('data-user-id'));
+            });
+        });
+
+        document.getElementById('closeUpdateUserModal').addEventListener('click', closeUpdateUserModal);
+        document.getElementById('dismissUpdateUserModal').addEventListener('click', closeUpdateUserModal);
+
+        updateUserOverlay.addEventListener('click', function (e) {
+            if (e.target === updateUserOverlay) closeUpdateUserModal();
+        });
+
+        function toggleUpdateModalPassword() {
+            var el = document.getElementById('updateModalPassword');
+            var chk = document.getElementById('updateModalShowPassword');
+            el.type = chk.checked ? 'text' : 'password';
+        }
+
+        document.getElementById('updateUserForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            closeUpdateUserModal();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #3b82f6;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8eaed;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .product-top {
+            display: flex;
+            gap: 2rem;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e8eaed;
+        }
+        .product-image-wrap {
+            flex-shrink: 0;
+        }
+        .product-image {
+            width: 220px;
+            height: 220px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #e8eaed;
+            display: block;
+        }
+        .product-image-fallback {
+            width: 220px;
+            height: 220px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e8eaed 0%, #d1d5db 100%);
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            border: 2px solid #e5e7eb;
+        }
+        .product-image-fallback.hidden { display: none; }
+        .product-image.hidden { display: none; }
+        .product-heading {
+            flex: 1;
+            min-width: 0;
+        }
+        .product-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            margin-bottom: 0.35rem;
+        }
+        .product-barcode {
+            font-size: 0.95rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+        }
+        .status-badge {
+            padding: 0.3rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-in-stock { background: #d1fae5; color: #065f46; }
+        .status-out-of-stock { background: #fee2e2; color: #991b1b; }
+
+        .detail-row {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label {
+            width: 160px;
+            flex-shrink: 0;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6b7280;
+        }
+        .detail-value {
+            font-size: 0.95rem;
+            color: #1a1d21;
+        }
+        .detail-value.description { white-space: pre-wrap; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .product-top { flex-direction: column; }
+            .product-image, .product-image-fallback { width: 100%; max-width: 280px; height: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="ListProduct.html" class="active">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:16:14 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <a href="ListProduct.html" class="back-link">← Back to Stock Inventory</a>
+            <h1 class="content-title">Product Detail</h1>
+
+            <div class="detail-card">
+                <div class="product-top">
+                    <div class="product-image-wrap">
+                        <img id="productImg" class="product-image" src="" alt="Product" onerror="this.classList.add('hidden'); document.getElementById('productImgFallback').classList.remove('hidden');">
+                        <div id="productImgFallback" class="product-image-fallback">Product Image</div>
+                    </div>
+                    <div class="product-heading">
+                        <div class="product-name" id="productName">—</div>
+                        <div class="product-barcode" id="productBarcode">Barcode: —</div>
+                        <span id="productStatus" class="status-badge">—</span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Barcode</span>
+                    <span class="detail-value" id="barcode">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Product Batch</span>
+                    <span class="detail-value" id="productBatch">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Product Name</span>
+                    <span class="detail-value" id="detailProductName">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Product Description</span>
+                    <span class="detail-value description" id="productDescription">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Cost Price</span>
+                    <span class="detail-value" id="costPrice">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Selling Price</span>
+                    <span class="detail-value" id="sellingPrice">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Qty (Cartons)</span>
+                    <span class="detail-value" id="qtyCartons">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">In Stock</span>
+                    <span class="detail-value" id="inStock">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Supplier</span>
+                    <span class="detail-value" id="supplier">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Category</span>
+                    <span class="detail-value" id="category">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">MFT Date</span>
+                    <span class="detail-value" id="mftDate">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Expiry Date</span>
+                    <span class="detail-value" id="expiryDate">—</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var products = {
+                1: {
+                    barcode: 'B100001',
+                    productBatch: 'Jan-2025 Ba',
+                    productName: 'Biro',
+                    productDescription: 'Ballpoint pen, blue ink, standard size.',
+                    costPrice: 'N650',
+                    sellingPrice: 'N750.00',
+                    qtyCartons: 20,
+                    inStock: 200,
+                    supplier: 'ABC Supplies',
+                    category: 'Stationery',
+                    mftDate: '2024-10-01',
+                    expiryDate: '2025-04-02',
+                    status: 'In Stock',
+                    statusClass: 'status-in-stock',
+                    imageUrl: ''
+                },
+                2: {
+                    barcode: 'ACD00909',
+                    productBatch: 'Feb-2025 Ex',
+                    productName: 'Exercise Book',
+                    productDescription: 'A4 ruled exercise book, 96 pages.',
+                    costPrice: 'N1,200',
+                    sellingPrice: 'N1,350.00',
+                    qtyCartons: 30,
+                    inStock: 300,
+                    supplier: 'Global Traders',
+                    category: 'Stationery',
+                    mftDate: '2024-11-05',
+                    expiryDate: '2025-04-03',
+                    status: 'In Stock',
+                    statusClass: 'status-in-stock',
+                    imageUrl: ''
+                },
+                3: {
+                    barcode: 'AGT90012',
+                    productBatch: 'Mar-2025 Bn',
+                    productName: 'Big Note',
+                    productDescription: 'Large sticky notes, 76x76mm, yellow.',
+                    costPrice: 'N350',
+                    sellingPrice: 'N400.00',
+                    qtyCartons: 10,
+                    inStock: 0,
+                    supplier: 'Metro Wholesale',
+                    category: 'Stationery',
+                    mftDate: '2024-12-01',
+                    expiryDate: '2025-04-04',
+                    status: 'Out of Stock',
+                    statusClass: 'status-out-of-stock',
+                    imageUrl: ''
+                },
+                4: {
+                    barcode: 'CHA10001',
+                    productBatch: 'Jan-2025 Ch',
+                    productName: 'Colored Chalk',
+                    productDescription: 'Assorted colored chalk, box of 12.',
+                    costPrice: 'N400',
+                    sellingPrice: 'N450.00',
+                    qtyCartons: 15,
+                    inStock: 200,
+                    supplier: 'Prime Distributors',
+                    category: 'Stationery',
+                    mftDate: '2024-09-15',
+                    expiryDate: '2025-04-05',
+                    status: 'In Stock',
+                    statusClass: 'status-in-stock',
+                    imageUrl: ''
+                }
+            };
+
+            function getProductId() {
+                var params = new URLSearchParams(window.location.search);
+                return params.get('id') || '1';
+            }
+
+            function formatDate(str) {
+                if (!str) return '—';
+                var d = new Date(str);
+                if (isNaN(d.getTime())) return str;
+                var day = d.getDate();
+                var month = d.toLocaleString('en', { month: 'long' });
+                var year = d.getFullYear();
+                return day + ' ' + month + ', ' + year;
+            }
+
+            var id = getProductId();
+            var p = products[id] || products[1];
+
+            document.getElementById('productName').textContent = p.productName;
+            document.getElementById('productBarcode').textContent = 'Barcode: ' + p.barcode;
+            document.getElementById('productStatus').textContent = p.status;
+            document.getElementById('productStatus').className = 'status-badge ' + p.statusClass;
+
+            document.getElementById('barcode').textContent = p.barcode;
+            document.getElementById('productBatch').textContent = p.productBatch;
+            document.getElementById('detailProductName').textContent = p.productName;
+            document.getElementById('productDescription').textContent = p.productDescription || '—';
+            document.getElementById('costPrice').textContent = p.costPrice;
+            document.getElementById('sellingPrice').textContent = p.sellingPrice;
+            document.getElementById('qtyCartons').textContent = p.qtyCartons;
+            document.getElementById('inStock').textContent = p.inStock;
+            document.getElementById('supplier').textContent = p.supplier;
+            document.getElementById('category').textContent = p.category;
+            document.getElementById('mftDate').textContent = formatDate(p.mftDate);
+            document.getElementById('expiryDate').textContent = formatDate(p.expiryDate);
+
+            if (p.imageUrl) {
+                var img = document.getElementById('productImg');
+                img.src = p.imageUrl;
+                img.classList.remove('hidden');
+                document.getElementById('productImgFallback').classList.add('hidden');
+            }
+        })();
+    </script>
+</body>
+</html>

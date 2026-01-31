@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Detail - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header .logo {
+            width: 36px;
+            height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 3px solid white;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content {
+            padding: 2rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8eaed;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label {
+            width: 160px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6b7280;
+        }
+        .detail-value {
+            font-size: 0.95rem;
+            color: #1a1d21;
+        }
+
+        .user-photo-row {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .user-photo-wrap {
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .user-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e8eaed;
+            display: block;
+        }
+
+        .user-photo-fallback {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            border: 3px solid #e8eaed;
+        }
+
+        .user-photo-fallback.hidden {
+            display: none;
+        }
+
+        .user-photo.hidden {
+            display: none;
+        }
+
+        .user-photo-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #1a1d21;
+        }
+
+        .user-photo-role {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-deactive { background: #fee2e2; color: #991b1b; }
+        .status-waiting { background: #e0e7ff; color: #3730a3; }
+
+        .last-login {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn-view-detail {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.7rem 1.35rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-top: 1rem;
+        }
+        .btn-view-detail:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+        }
+
+        .schedule-section {
+            display: none;
+            margin-top: 1.5rem;
+        }
+        .schedule-section.is-open { display: block; }
+
+        .schedule-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1d21;
+            margin-bottom: 1rem;
+        }
+
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+        }
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .schedule-table th {
+            background: #f7f8fa;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e8eaed;
+            font-size: 0.85rem;
+        }
+        .schedule-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+        .schedule-table td:nth-child(4) {
+            text-align: right;
+            font-weight: 500;
+        }
+        .schedule-table tbody tr:last-child td { border-bottom: none; }
+        .schedule-table tbody tr:hover { background: #f7f8fa; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="users.html" class="active">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge" id="headerTime">11:14:36 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <a href="users.html" class="back-link">← Quay lại danh sách Users</a>
+            <h1 class="content-title">Thông tin User</h1>
+
+            <div class="detail-card">
+                <div class="user-photo-row">
+                    <div class="user-photo-wrap">
+                        <img id="detailPhoto" class="user-photo" src="" alt="Avatar" onerror="this.classList.add('hidden'); document.getElementById('detailPhotoFallback').classList.remove('hidden'); document.getElementById('detailPhotoFallback').textContent=document.getElementById('detailPhotoFallback').getAttribute('data-initial');">
+                        <div id="detailPhotoFallback" class="user-photo-fallback hidden" data-initial="—">—</div>
+                    </div>
+                    <div>
+                        <div class="user-photo-name" id="detailFullnameTop">—</div>
+                        <div class="user-photo-role" id="detailRoleTop">—</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Fullname</span>
+                    <span class="detail-value" id="detailFullname">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Username</span>
+                    <span class="detail-value" id="detailUsername">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">e-Mail</span>
+                    <span class="detail-value" id="detailEmail">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Role</span>
+                    <span class="detail-value" id="detailRole">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">ID Card</span>
+                    <span class="detail-value" id="detailIdCard">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Trạng thái</span>
+                    <span class="detail-value" id="detailStatus">—</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Lần đăng nhập cuối</span>
+                    <span class="detail-value">
+                        <span class="last-login" id="detailLastLogin">—</span>
+                    </span>
+                </div>
+            </div>
+
+            <button type="button" class="btn-view-detail" id="btnViewDetail">Xem chi tiết</button>
+
+            <div class="schedule-section" id="scheduleSection">
+                <h2 class="schedule-title">Lịch ca làm việc (tuần)</h2>
+                <div class="table-container">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Thứ</th>
+                                <th>Giờ đăng nhập</th>
+                                <th>Giờ đăng xuất</th>
+                                <th>Doanh thu ca</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleBody">
+                            <tr><td>Thứ 2</td><td id="monLogin">—</td><td id="monLogout">—</td><td id="monRevenue">—</td></tr>
+                            <tr><td>Thứ 3</td><td id="tueLogin">—</td><td id="tueLogout">—</td><td id="tueRevenue">—</td></tr>
+                            <tr><td>Thứ 4</td><td id="wedLogin">—</td><td id="wedLogout">—</td><td id="wedRevenue">—</td></tr>
+                            <tr><td>Thứ 5</td><td id="thuLogin">—</td><td id="thuLogout">—</td><td id="thuRevenue">—</td></tr>
+                            <tr><td>Thứ 6</td><td id="friLogin">—</td><td id="friLogout">—</td><td id="friRevenue">—</td></tr>
+                            <tr><td>Thứ 7</td><td id="satLogin">—</td><td id="satLogout">—</td><td id="satRevenue">—</td></tr>
+                            <tr><td>Chủ nhật</td><td id="sunLogin">—</td><td id="sunLogout">—</td><td id="sunRevenue">—</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var userData = {
+            '1': {
+                fullname: 'Kode Made Eazy',
+                username: 'kodemade',
+                email: 'admin@kode.com',
+                role: 'Administrator',
+                idCard: '123456789012',
+                status: 'active',
+                avatar: 'https://i.pravatar.cc/200?u=kode1',
+                lastLogin: '31/01/2025 09:15:22',
+                schedule: [
+                    { login: '08:00', logout: '12:00', revenue: '2.450.000' },
+                    { login: '08:15', logout: '12:30', revenue: '1.820.000' },
+                    { login: '08:00', logout: '17:00', revenue: '5.100.000' },
+                    { login: '08:00', logout: '17:00', revenue: '4.890.000' },
+                    { login: '08:00', logout: '16:45', revenue: '4.650.000' },
+                    { login: '—', logout: '—', revenue: '—' },
+                    { login: '—', logout: '—', revenue: '—' }
+                ]
+            },
+            '2': {
+                fullname: 'John Smith',
+                username: 'jsmith',
+                email: 'john@pos.com',
+                role: 'User',
+                idCard: '987654321098',
+                status: 'deactive',
+                avatar: 'https://i.pravatar.cc/200?u=john2',
+                lastLogin: '30/01/2025 14:22:10',
+                schedule: [
+                    { login: '09:00', logout: '17:00', revenue: '3.200.000' },
+                    { login: '09:00', logout: '17:00', revenue: '2.980.000' },
+                    { login: '09:15', logout: '17:00', revenue: '3.150.000' },
+                    { login: '—', logout: '—', revenue: '—' },
+                    { login: '09:00', logout: '15:30', revenue: '2.100.000' },
+                    { login: '—', logout: '—', revenue: '—' },
+                    { login: '—', logout: '—', revenue: '—' }
+                ]
+            },
+            '3': {
+                fullname: 'Sarah Johnson',
+                username: 'sjohnson',
+                email: 'sarah@pos.com',
+                role: 'User',
+                idCard: '456789123456',
+                status: 'waiting',
+                avatar: 'https://i.pravatar.cc/200?u=sarah3',
+                lastLogin: '29/01/2025 07:55:00',
+                schedule: [
+                    { login: '07:30', logout: '11:30', revenue: '1.550.000' },
+                    { login: '07:30', logout: '11:30', revenue: '1.620.000' },
+                    { login: '07:30', logout: '11:30', revenue: '1.480.000' },
+                    { login: '07:30', logout: '11:30', revenue: '1.710.000' },
+                    { login: '07:30', logout: '11:30', revenue: '1.590.000' },
+                    { login: '08:00', logout: '12:00', revenue: '980.000' },
+                    { login: '—', logout: '—', revenue: '—' }
+                ]
+            }
+        };
+
+        function getUserId() {
+            var params = new URLSearchParams(window.location.search);
+            return params.get('id') || '1';
+        }
+
+        function renderUser(id) {
+            var user = userData[id] || userData['1'];
+            var photo = document.getElementById('detailPhoto');
+            var fallback = document.getElementById('detailPhotoFallback');
+            if (user.avatar) {
+                photo.src = user.avatar;
+                photo.classList.remove('hidden');
+                fallback.classList.add('hidden');
+                fallback.setAttribute('data-initial', user.fullname.charAt(0));
+            } else {
+                photo.classList.add('hidden');
+                fallback.classList.remove('hidden');
+                fallback.setAttribute('data-initial', user.fullname.charAt(0));
+                fallback.textContent = user.fullname.charAt(0);
+            }
+            document.getElementById('detailFullnameTop').textContent = user.fullname;
+            document.getElementById('detailRoleTop').textContent = user.role;
+            document.getElementById('detailFullname').textContent = user.fullname;
+            document.getElementById('detailUsername').textContent = user.username;
+            document.getElementById('detailEmail').textContent = user.email;
+            document.getElementById('detailRole').textContent = user.role;
+            document.getElementById('detailIdCard').textContent = user.idCard || '—';
+            var statusEl = document.getElementById('detailStatus');
+            if (user.status === 'active') statusEl.innerHTML = '<span class="status-badge status-active">Active</span>';
+            else if (user.status === 'deactive') statusEl.innerHTML = '<span class="status-badge status-deactive">Deactive</span>';
+            else statusEl.innerHTML = '<span class="status-badge status-waiting">Waiting</span>';
+            document.getElementById('detailLastLogin').textContent = user.lastLogin;
+
+            var days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+            var s = user.schedule;
+            for (var i = 0; i < 7; i++) {
+                document.getElementById(days[i] + 'Login').textContent = s[i].login;
+                document.getElementById(days[i] + 'Logout').textContent = s[i].logout;
+                document.getElementById(days[i] + 'Revenue').textContent = s[i].revenue || '—';
+            }
+        }
+
+        document.getElementById('btnViewDetail').addEventListener('click', function () {
+            document.getElementById('scheduleSection').classList.add('is-open');
+        });
+
+        (function init() {
+            var id = getUserId();
+            renderUser(id);
+        })();
+    </script>
+</body>
+</html>

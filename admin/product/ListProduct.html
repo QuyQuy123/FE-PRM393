@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Inventory - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 3px solid white;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #3b82f6;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+        }
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            letter-spacing: -0.02em;
+        }
+        .content-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .btn-import {
+            background: #4b5563;
+            color: white;
+            padding: 0.7rem 1.35rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-import:hover {
+            background: #374151;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(75, 85, 99, 0.3);
+        }
+        .btn-add-product {
+            background: #93c5fd;
+            color: #1e40af;
+            padding: 0.7rem 1.35rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-add-product:hover {
+            background: #60a5fa;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        }
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+        }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th {
+            background: #f7f8fa;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e8eaed;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+        .table tbody tr:last-child td { border-bottom: none; }
+        .table tbody tr:hover { background: #f7f8fa; }
+        .table td:nth-child(5) { font-weight: 500; }
+        .table td:nth-child(6) { text-align: right; }
+        .barcode-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .barcode-link:hover { text-decoration: underline; }
+        .status-badge {
+            padding: 0.3rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 95px;
+        }
+        .status-in-stock { background: #d1fae5; color: #065f46; }
+        .status-out-of-stock { background: #fee2e2; color: #991b1b; }
+        .action-buttons { display: flex; gap: 0.5rem; }
+        .btn {
+            padding: 0.45rem 0.9rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-edit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-edit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+        .btn-delete { background: #dc2626; color: white; }
+        .btn-delete:hover { background: #b91c1c; }
+
+        /* Add Product Modal */
+        .product-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .product-modal-overlay.is-open { display: flex; }
+        .product-modal-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .product-modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .product-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a1d21;
+        }
+        .product-modal-close {
+            width: 36px; height: 36px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .product-modal-close:hover {
+            background: #e5e7eb;
+            color: #1a1d21;
+        }
+        .product-modal-body {
+            padding: 1.5rem;
+        }
+        .product-form .form-group {
+            margin-bottom: 1rem;
+        }
+        .product-form label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+        .product-form input[type="text"],
+        .product-form input[type="number"],
+        .product-form input[type="date"],
+        .product-form select,
+        .product-form textarea {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #1a1d21;
+            font-family: inherit;
+        }
+        .product-form input:focus,
+        .product-form select:focus,
+        .product-form textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        .product-form input[type="file"] {
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+            color: #374151;
+            cursor: pointer;
+        }
+        .product-form input[type="file"]::file-selector-button {
+            padding: 0.5rem 1rem;
+            margin-right: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #f3f4f6;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #374151;
+            cursor: pointer;
+        }
+        .product-form input[type="file"]::file-selector-button:hover {
+            background: #e5e7eb;
+        }
+        .product-form textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .product-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .product-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e8eaed;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        .btn-modal-cancel {
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #dc2626;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .btn-modal-cancel:hover { background: #b91c1c; }
+        .btn-modal-submit {
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #16a34a;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .btn-modal-submit:hover { background: #15803d; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .header { padding: 1rem; }
+            .content { padding: 1rem; }
+            .content-actions { flex-wrap: wrap; }
+            .table-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="ListProduct.html" class="active">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:16:14 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="content-header">
+                <h1 class="content-title">Stock Inventory</h1>
+                <div class="content-actions">
+                    <a href="#" class="btn-import">Import Product</a>
+                    <a href="#" class="btn-add-product" id="openAddProductModal">+ Add New Product</a>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>BARCODE</th>
+                            <th>PRODUCTS</th>
+                            <th>CATEGORY</th>
+                            <th>EXPIRE</th>
+                            <th>PRICE</th>
+                            <th>IN STOCK</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="ViewProductDetail.html?id=1" class="barcode-link">B100001</a></td>
+                            <td>Biro</td>
+                            <td>stationery</td>
+                            <td>April 2nd, 2025</td>
+                            <td>750.00</td>
+                            <td>200</td>
+                            <td><span class="status-badge status-in-stock">In Stock</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit openUpdateProductModal" data-product-id="1">Edit</a>
+                                    <a href="#" class="btn btn-delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a href="ViewProductDetail.html?id=2" class="barcode-link">ACD00909</a></td>
+                            <td>Exercise Book</td>
+                            <td>stationery</td>
+                            <td>April 3rd, 2025</td>
+                            <td>1,350.00</td>
+                            <td>300</td>
+                            <td><span class="status-badge status-in-stock">In Stock</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit openUpdateProductModal" data-product-id="2">Edit</a>
+                                    <a href="#" class="btn btn-delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a href="ViewProductDetail.html?id=3" class="barcode-link">AGT90012</a></td>
+                            <td>Big Note</td>
+                            <td>stationery</td>
+                            <td>April 4th, 2025</td>
+                            <td>400.00</td>
+                            <td>0</td>
+                            <td><span class="status-badge status-out-of-stock">Out of Stock</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit openUpdateProductModal" data-product-id="3">Edit</a>
+                                    <a href="#" class="btn btn-delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><a href="ViewProductDetail.html?id=4" class="barcode-link">CHA10001</a></td>
+                            <td>Colored Chalk</td>
+                            <td>stationery</td>
+                            <td>April 5th, 2025</td>
+                            <td>450.00</td>
+                            <td>200</td>
+                            <td><span class="status-badge status-in-stock">In Stock</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn btn-edit openUpdateProductModal" data-product-id="4">Edit</a>
+                                    <a href="#" class="btn btn-delete">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="product-modal-overlay" id="addProductModal" role="dialog" aria-labelledby="addProductModalTitle">
+        <div class="product-modal-card">
+            <div class="product-modal-header">
+                <h2 class="product-modal-title" id="addProductModalTitle">Add Product</h2>
+                <button type="button" class="product-modal-close" id="closeAddProductModal" aria-label="Close">&times;</button>
+            </div>
+            <div class="product-modal-body">
+                <form class="product-form" id="addProductForm">
+                    <div class="form-group">
+                        <label for="productBatch">Product Batch</label>
+                        <input type="text" id="productBatch" name="productBatch" placeholder="e.g Jan-2023 Ba">
+                    </div>
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" id="productName" name="productName" placeholder="e.g T-Shirt">
+                    </div>
+                    <div class="form-group">
+                        <label for="productDescription">Product Description</label>
+                        <textarea id="productDescription" name="productDescription" placeholder="Men T-Shirt"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="costPrice">Cost Price</label>
+                            <input type="text" id="costPrice" name="costPrice" placeholder="N2000">
+                        </div>
+                        <div class="form-group">
+                            <label for="sellingPrice">Selling Price</label>
+                            <input type="text" id="sellingPrice" name="sellingPrice" placeholder="N2500">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="qtyCartons">Qty (Cartons)</label>
+                        <input type="number" id="qtyCartons" name="qtyCartons" placeholder="0" min="0">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="supplier">Supplier</label>
+                            <select id="supplier" name="supplier">
+                                <option value="">Choose...</option>
+                                <option value="1">ABC Supplies</option>
+                                <option value="2">Global Traders</option>
+                                <option value="3">Metro Wholesale</option>
+                                <option value="4">Prime Distributors</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" name="category">
+                                <option value="">Choose...</option>
+                                <option value="1">Clothing</option>
+                                <option value="2">Drinks</option>
+                                <option value="3">Food</option>
+                                <option value="4">Stationery</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mftDate">MFT Date</label>
+                            <input type="date" id="mftDate" name="mftDate" placeholder="dd/mm/yyyy">
+                        </div>
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date</label>
+                            <input type="date" id="expiryDate" name="expiryDate" placeholder="dd/mm/yyyy">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="productImage">Product Image</label>
+                        <input type="file" id="productImage" name="productImage" accept="image/*">
+                    </div>
+                </form>
+            </div>
+            <div class="product-modal-footer">
+                <button type="button" class="btn-modal-cancel" id="cancelAddProduct">Cancel</button>
+                <button type="button" class="btn-modal-submit" id="submitAddProduct">Submit</button>
+            </div>
+        </div>
+    </div>
+    <!-- end Add Product Modal -->
+
+    <!-- Update Product Modal -->
+    <div class="product-modal-overlay" id="updateProductModal" role="dialog" aria-labelledby="updateProductModalTitle">
+        <div class="product-modal-card">
+            <div class="product-modal-header">
+                <h2 class="product-modal-title" id="updateProductModalTitle">Update Product</h2>
+                <button type="button" class="product-modal-close" id="closeUpdateProductModal" aria-label="Close">&times;</button>
+            </div>
+            <div class="product-modal-body">
+                <form class="product-form" id="updateProductForm">
+                    <div class="form-group">
+                        <label for="updateProductBatch">Product Batch</label>
+                        <input type="text" id="updateProductBatch" name="productBatch" placeholder="e.g Jan-2023 Ba">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateProductName">Product Name</label>
+                        <input type="text" id="updateProductName" name="productName" placeholder="e.g T-Shirt">
+                    </div>
+                    <div class="form-group">
+                        <label for="updateProductDescription">Product Description</label>
+                        <textarea id="updateProductDescription" name="productDescription" placeholder="Men T-Shirt"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="updateCostPrice">Cost Price</label>
+                            <input type="text" id="updateCostPrice" name="costPrice" placeholder="N2000">
+                        </div>
+                        <div class="form-group">
+                            <label for="updateSellingPrice">Selling Price</label>
+                            <input type="text" id="updateSellingPrice" name="sellingPrice" placeholder="N2500">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateQtyCartons">Qty (Cartons)</label>
+                        <input type="number" id="updateQtyCartons" name="qtyCartons" placeholder="0" min="0">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="updateSupplier">Supplier</label>
+                            <select id="updateSupplier" name="supplier">
+                                <option value="">Choose...</option>
+                                <option value="1">ABC Supplies</option>
+                                <option value="2">Global Traders</option>
+                                <option value="3">Metro Wholesale</option>
+                                <option value="4">Prime Distributors</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateCategory">Category</label>
+                            <select id="updateCategory" name="category">
+                                <option value="">Choose...</option>
+                                <option value="1">Clothing</option>
+                                <option value="2">Drinks</option>
+                                <option value="3">Food</option>
+                                <option value="4">Stationery</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="updateMftDate">MFT Date</label>
+                            <input type="date" id="updateMftDate" name="mftDate" placeholder="dd/mm/yyyy">
+                        </div>
+                        <div class="form-group">
+                            <label for="updateExpiryDate">Expiry Date</label>
+                            <input type="date" id="updateExpiryDate" name="expiryDate" placeholder="dd/mm/yyyy">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="product-modal-footer">
+                <button type="button" class="btn-modal-cancel" id="cancelUpdateProduct">Cancel</button>
+                <button type="button" class="btn-modal-submit" id="submitUpdateProduct">Update</button>
+            </div>
+        </div>
+    </div>
+    <!-- end Update Product Modal -->
+
+    <script>
+        (function () {
+            var addModal = document.getElementById('addProductModal');
+            var openAddBtn = document.getElementById('openAddProductModal');
+            var closeAddBtn = document.getElementById('closeAddProductModal');
+            var cancelAddBtn = document.getElementById('cancelAddProduct');
+            var submitAddBtn = document.getElementById('submitAddProduct');
+
+            function openAddModal() {
+                addModal.classList.add('is-open');
+            }
+            function closeAddModal() {
+                addModal.classList.remove('is-open');
+            }
+
+            if (openAddBtn) openAddBtn.addEventListener('click', function (e) { e.preventDefault(); openAddModal(); });
+            if (closeAddBtn) closeAddBtn.addEventListener('click', closeAddModal);
+            if (cancelAddBtn) cancelAddBtn.addEventListener('click', closeAddModal);
+            if (submitAddBtn) submitAddBtn.addEventListener('click', function () {
+                closeAddModal();
+            });
+            addModal.addEventListener('click', function (e) {
+                if (e.target === addModal) closeAddModal();
+            });
+
+            var updateModal = document.getElementById('updateProductModal');
+            var closeUpdateBtn = document.getElementById('closeUpdateProductModal');
+            var cancelUpdateBtn = document.getElementById('cancelUpdateProduct');
+            var submitUpdateBtn = document.getElementById('submitUpdateProduct');
+
+            var productsData = {
+                1: { productBatch: 'Jan-2025 Ba', productName: 'Biro', productDescription: 'Ballpoint pen, blue ink, standard size.', costPrice: '650', sellingPrice: '750', qtyCartons: 20, supplier: '1', category: '4', mftDate: '2024-10-01', expiryDate: '2025-04-02' },
+                2: { productBatch: 'Feb-2025 Ex', productName: 'Exercise Book', productDescription: 'A4 ruled exercise book, 96 pages.', costPrice: '1200', sellingPrice: '1350', qtyCartons: 30, supplier: '2', category: '4', mftDate: '2024-11-05', expiryDate: '2025-04-03' },
+                3: { productBatch: 'Mar-2025 Bn', productName: 'Big Note', productDescription: 'Large sticky notes, 76x76mm, yellow.', costPrice: '350', sellingPrice: '400', qtyCartons: 10, supplier: '3', category: '4', mftDate: '2024-12-01', expiryDate: '2025-04-04' },
+                4: { productBatch: 'Jan-2025 Ch', productName: 'Colored Chalk', productDescription: 'Assorted colored chalk, box of 12.', costPrice: '400', sellingPrice: '450', qtyCartons: 15, supplier: '4', category: '4', mftDate: '2024-09-15', expiryDate: '2025-04-05' }
+            };
+
+            function openUpdateModal(productId) {
+                var p = productsData[productId] || productsData[1];
+                document.getElementById('updateProductBatch').value = p.productBatch || '';
+                document.getElementById('updateProductName').value = p.productName || '';
+                document.getElementById('updateProductDescription').value = p.productDescription || '';
+                document.getElementById('updateCostPrice').value = p.costPrice || '';
+                document.getElementById('updateSellingPrice').value = p.sellingPrice || '';
+                document.getElementById('updateQtyCartons').value = p.qtyCartons || '';
+                document.getElementById('updateSupplier').value = p.supplier || '';
+                document.getElementById('updateCategory').value = p.category || '';
+                document.getElementById('updateMftDate').value = p.mftDate || '';
+                document.getElementById('updateExpiryDate').value = p.expiryDate || '';
+                updateModal.classList.add('is-open');
+            }
+            function closeUpdateModal() {
+                updateModal.classList.remove('is-open');
+            }
+
+            document.querySelectorAll('.openUpdateProductModal').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var id = this.getAttribute('data-product-id') || '1';
+                    openUpdateModal(id);
+                });
+            });
+            if (closeUpdateBtn) closeUpdateBtn.addEventListener('click', closeUpdateModal);
+            if (cancelUpdateBtn) cancelUpdateBtn.addEventListener('click', closeUpdateModal);
+            if (submitUpdateBtn) submitUpdateBtn.addEventListener('click', function () {
+                closeUpdateModal();
+            });
+            updateModal.addEventListener('click', function (e) {
+                if (e.target === updateModal) closeUpdateModal();
+            });
+        })();
+    </script>
+</body>
+</html>

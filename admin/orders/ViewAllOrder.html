@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders List - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #0d9488;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #1e293b;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.75rem;
+        }
+
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+        .table th,
+        .table td {
+            padding: 0.875rem 1rem;
+            vertical-align: middle;
+            font-size: 0.875rem;
+        }
+        .table th {
+            background: #f7f8fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table td {
+            color: #374151;
+        }
+        .table tbody tr:hover { background: #f7f8fa; }
+
+        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; min-width: 6rem; }
+        .table th:nth-child(2), .table td:nth-child(2) { text-align: left; min-width: 10rem; }
+        .table th:nth-child(3), .table td:nth-child(3) { text-align: right; min-width: 5rem; }
+        .table th:nth-child(4), .table td:nth-child(4) { text-align: right; min-width: 4rem; }
+        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; min-width: 5rem; }
+        .table th:nth-child(6), .table td:nth-child(6) { text-align: right; min-width: 5rem; }
+        .table th:nth-child(7), .table td:nth-child(7) { text-align: left; min-width: 5rem; }
+        .table th:nth-child(8), .table td:nth-child(8) { text-align: left; min-width: 5rem; }
+        .table th:nth-child(9), .table td:nth-child(9) { text-align: left; min-width: 5rem; }
+        .table th:nth-child(10), .table td:nth-child(10) { text-align: left; min-width: 10rem; }
+        .table th:nth-child(11), .table td:nth-child(11) { text-align: center; min-width: 5rem; }
+
+        .status-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-paid { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .header { padding: 1rem; }
+            .content { padding: 1rem; }
+            .table-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="#">Barcode Scanner</a></li>
+                <li><a href="ViewAllOrder.html" class="active">Orders</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:17:23 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">kodemade</div>
+                        <div class="role">Administrator</div>
+                    </div>
+                    <div class="user-avatar">K</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1 class="content-title">Orders List</h1>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Phone</th>
+                            <th>Total</th>
+                            <th>Discount (%)</th>
+                            <th>Payable</th>
+                            <th>Paid</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Cashier</th>
+                            <th>Payment Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ORD-001</td>
+                            <td>0901234567</td>
+                            <td>đ125,000</td>
+                            <td>5</td>
+                            <td>đ118,750</td>
+                            <td>đ118,750</td>
+                            <td>Card</td>
+                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>John</td>
+                            <td>10:15 AM, 02/01/2025</td>
+                            <td><a href="ViewOrderDetail.html?id=1">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>ORD-002</td>
+                            <td>0987463212</td>
+                            <td>đ85,400</td>
+                            <td>0</td>
+                            <td>đ85,400</td>
+                            <td>đ85,400</td>
+                            <td>Cash</td>
+                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>Jane</td>
+                            <td>14:30, 03/01/2025</td>
+                            <td><a href="ViewOrderDetail.html?id=2">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>ORD-003</td>
+                            <td>0912345678</td>
+                            <td>đ250,000</td>
+                            <td>10</td>
+                            <td>đ189,000</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>John</td>
+                            <td>09:00 AM, 04/01/2025</td>
+                            <td><a href="ViewOrderDetail.html?id=3">View</a></td>
+                        </tr>
+                        <tr>
+                            <td>ORD-004</td>
+                            <td>0923456789</td>
+                            <td>đ45,200</td>
+                            <td>3</td>
+                            <td>đ43,844</td>
+                            <td>đ43,844</td>
+                            <td>Transfer</td>
+                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>Jane</td>
+                            <td>16:45, 05/01/2025</td>
+                            <td><a href="ViewOrderDetail.html?id=4">View</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
