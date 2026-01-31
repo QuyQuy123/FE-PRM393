@@ -161,6 +161,22 @@
             border-color: #0d9488;
             box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
         }
+        .btn-add-customer-points {
+            background: #0d9488;
+            color: white;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        .btn-add-customer-points:hover {
+            background: #0f766e;
+            color: white;
+        }
 
         .action-row {
             display: flex;
@@ -426,6 +442,136 @@
         .search-results .item:hover { background: #f0f9ff; }
         .search-results .item:last-child { border-bottom: none; }
 
+        /* Add Customer modal - overlay on main screen */
+        .add-customer-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        .add-customer-modal-overlay.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .add-customer-modal-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+        .add-customer-modal-overlay.is-open .add-customer-modal-card {
+            transform: scale(1);
+        }
+        .add-customer-modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e8eaed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+            color: white;
+        }
+        .add-customer-modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .add-customer-modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .add-customer-modal-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .add-customer-modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        .add-customer-modal-body .form-group {
+            margin-bottom: 1rem;
+        }
+        .add-customer-modal-body .form-group:last-child { margin-bottom: 0; }
+        .add-customer-modal-body label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.35rem;
+        }
+        .add-customer-modal-body input {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .add-customer-modal-body input:focus {
+            outline: none;
+            border-color: #0d9488;
+            box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+        }
+        .add-customer-modal-body .form-hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.35rem;
+        }
+        .add-customer-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e8eaed;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        .add-customer-modal-footer .btn-cancel {
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .add-customer-modal-footer .btn-cancel:hover { background: #e5e7eb; }
+        .add-customer-modal-footer .btn-submit {
+            background: #0d9488;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .add-customer-modal-footer .btn-submit:hover { background: #0f766e; }
+
         @media (max-width: 768px) {
             .sidebar { width: 240px; }
             .main-content { margin-left: 260px; }
@@ -478,18 +624,19 @@
             <div class="customer-row">
                 <label>Customer Name: <input type="text" id="customerName" placeholder="Optional [Required for credit sales]"></label>
                 <label>Phone: <input type="text" id="customerPhone" placeholder="Optional [Required for credit sales]"></label>
+                <button type="button" id="btnOpenAddCustomerModal" class="btn-add-customer-points">Add customer for points</button>
             </div>
 
             <div class="action-row">
                 <button type="button" class="btn-add-cart" id="btnAddToCart">+ Add To Cart</button>
-                <button type="button" class="btn-scan" id="btnScanBarcode">Quét mã sản phẩm</button>
+                <button type="button" class="btn-scan" id="btnScanBarcode">Scan product barcode</button>
                 <div class="barcode-input-wrap">
-                    <input type="text" id="barcodeInput" placeholder="Quét hoặc nhập mã vạch..." autocomplete="off">
+                    <input type="text" id="barcodeInput" placeholder="Scan or enter barcode..." autocomplete="off">
                 </div>
                 <div class="search-wrap">
-                    <label>Search sản phẩm:</label>
-                    <input type="text" id="searchProduct" placeholder="Tìm tên hoặc mã sản phẩm..." autocomplete="off">
-                    <a href="#" id="linkSearchPage" class="link-search-page">Xem trang tìm kiếm</a>
+                    <label>Search product:</label>
+                    <input type="text" id="searchProduct" placeholder="Search by name or code..." autocomplete="off">
+                    <a href="#" id="linkSearchPage" class="link-search-page">View search page</a>
                     <div class="search-results" id="searchResults"></div>
                 </div>
             </div>
@@ -541,6 +688,37 @@
         <div class="pos-watermark">POINT OF SALES SYSTEM BY KODEMAGAZY</div>
     </div>
 
+    <!-- Add Customer (points) Modal -->
+    <div class="add-customer-modal-overlay" id="addCustomerModalOverlay" role="dialog" aria-labelledby="addCustomerModalTitle">
+        <div class="add-customer-modal-card">
+            <div class="add-customer-modal-header">
+                <h2 class="add-customer-modal-title" id="addCustomerModalTitle">Add customer for points</h2>
+                <button type="button" class="add-customer-modal-close" id="addCustomerModalClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="add-customer-modal-body">
+                <form id="addCustomerModalForm">
+                    <div class="form-group">
+                        <label for="modalPhone">Phone number</label>
+                        <input type="text" id="modalPhone" placeholder="e.g. 0901234567">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalCustomerName">Customer name</label>
+                        <input type="text" id="modalCustomerName" placeholder="e.g. John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalTotalAmount">Total amount (from bill)</label>
+                        <input type="text" id="modalTotalAmount" readonly placeholder="0">
+                        <div class="form-hint">Total is taken from the POS screen.</div>
+                    </div>
+                </form>
+            </div>
+            <div class="add-customer-modal-footer">
+                <button type="button" class="btn-cancel" id="addCustomerModalCancel">Cancel</button>
+                <button type="button" class="btn-submit" id="addCustomerModalSubmit">Save & add points</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function () {
             var productsByBarcode = {
@@ -561,7 +739,7 @@
             var cart = [];
             var discountPercent = 0;
 
-            // Demo: 5 sản phẩm trong giỏ
+            // Demo: 5 items in cart
             cart = [
                 { barcode: '8901234567890', name: 'Anni Item1', stock: 50, price: 85000, qty: 2 },
                 { barcode: '8901234567891', name: 'BD item1', stock: 30, price: 120000, qty: 1 },
@@ -611,15 +789,17 @@
                         '<td class="col-name">' + p.name + '</td>' +
                         '<td class="col-stock">' + p.stock + '</td>' +
                         '<td class="col-price">' + (p.price).toLocaleString('vi-VN') + 'đ</td>' +
-                        '<td class="col-qty"><div class="qty-controls"><button type="button" class="btn-qty btn-qty-minus" data-barcode="' + p.barcode + '" aria-label="Giảm">−</button><span class="qty-value">' + p.qty + '</span><button type="button" class="btn-qty btn-qty-plus" data-barcode="' + p.barcode + '" aria-label="Tăng">+</button></div></td>' +
+                        '<td class="col-qty"><div class="qty-controls"><button type="button" class="btn-qty btn-qty-minus" data-barcode="' + p.barcode + '" aria-label="Decrease">−</button><span class="qty-value">' + p.qty + '</span><button type="button" class="btn-qty btn-qty-plus" data-barcode="' + p.barcode + '" aria-label="Increase">+</button></div></td>' +
                         '<td class="col-subtotal">' + subtotal.toLocaleString('vi-VN') + 'đ</td>' +
                         '<td class="col-remove"><button type="button" class="btn-remove btn-remove-item">Remove</button></td></tr>';
                 });
-                tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:#6b7280;">Chưa có sản phẩm. Quét mã hoặc search để thêm.</td></tr>';
+                tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:#6b7280;">No products. Scan barcode or search to add.</td></tr>';
 
                 var grand = total;
                 if (discountPercent > 0) grand = total * (1 - discountPercent / 100);
-                document.getElementById('grandTotal').value = grand.toLocaleString('vi-VN') + 'đ';
+                var grandEl = document.getElementById('grandTotal');
+                grandEl.value = grand.toLocaleString('vi-VN') + 'đ';
+                grandEl.setAttribute('data-value', grand);
 
                 tbody.querySelectorAll('.btn-remove-item').forEach(function (btn) {
                     btn.addEventListener('click', function () {
@@ -699,6 +879,45 @@
                 window.location.href = 'SearchProduct.html' + (q ? '?q=' + encodeURIComponent(q) : '');
             });
 
+            var addCustomerModal = document.getElementById('addCustomerModalOverlay');
+            var btnOpenAddCustomer = document.getElementById('btnOpenAddCustomerModal');
+            var addCustomerModalClose = document.getElementById('addCustomerModalClose');
+            var addCustomerModalCancel = document.getElementById('addCustomerModalCancel');
+            var addCustomerModalSubmit = document.getElementById('addCustomerModalSubmit');
+
+            function openAddCustomerModal() {
+                var total = document.getElementById('grandTotal').getAttribute('data-value') || '0';
+                var totalNum = parseFloat(total) || 0;
+                document.getElementById('modalPhone').value = document.getElementById('customerPhone').value.trim();
+                document.getElementById('modalCustomerName').value = document.getElementById('customerName').value.trim();
+                document.getElementById('modalTotalAmount').value = totalNum.toLocaleString('vi-VN') + 'đ';
+                addCustomerModal.classList.add('is-open');
+            }
+            function closeAddCustomerModal() {
+                addCustomerModal.classList.remove('is-open');
+            }
+
+            if (btnOpenAddCustomer) btnOpenAddCustomer.addEventListener('click', openAddCustomerModal);
+            if (addCustomerModalClose) addCustomerModalClose.addEventListener('click', closeAddCustomerModal);
+            if (addCustomerModalCancel) addCustomerModalCancel.addEventListener('click', closeAddCustomerModal);
+            addCustomerModal.addEventListener('click', function (e) {
+                if (e.target === addCustomerModal) closeAddCustomerModal();
+            });
+            if (addCustomerModalSubmit) addCustomerModalSubmit.addEventListener('click', function () {
+                var phone = document.getElementById('modalPhone').value.trim();
+                var name = document.getElementById('modalCustomerName').value.trim();
+                if (!phone) {
+                    alert('Please enter phone number.');
+                    return;
+                }
+                if (!name) {
+                    alert('Please enter customer name.');
+                    return;
+                }
+                closeAddCustomerModal();
+                alert('Customer saved and points added (demo).');
+            });
+
             document.getElementById('btnAddToCart').addEventListener('click', function () {
                 var barcode = document.getElementById('barcodeInput').value.trim();
                 if (barcode) {
@@ -720,7 +939,7 @@
 
             document.getElementById('btnGenerateInvoice').addEventListener('click', function () {
                 if (cart.length === 0) {
-                    alert('Chưa có sản phẩm trong giỏ.');
+                    alert('No products in cart.');
                     return;
                 }
                 var total = cart.reduce(function (sum, p) { return sum + p.price * p.qty; }, 0);
@@ -758,7 +977,7 @@
                     sessionStorage.setItem('pos_invoice_data', JSON.stringify(invoiceData));
                     window.location.href = 'invoice.html';
                 } catch (e) {
-                    alert('Không thể tạo hóa đơn.');
+                    alert('Could not generate invoice.');
                 }
             });
 

@@ -395,6 +395,45 @@
         }
         .btn-modal-submit:hover { background: #15803d; }
 
+        .barcode-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+        .barcode-row .product-form input[type="text"] {
+            flex: 1;
+            min-width: 180px;
+        }
+        .btn-scan, .btn-generate {
+            padding: 0.65rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+        .btn-scan {
+            background: #0d9488;
+            color: white;
+        }
+        .btn-scan:hover { background: #0f766e; }
+        .btn-generate {
+            background: #667eea;
+            color: white;
+        }
+        .btn-generate:hover { background: #5a67d8; }
+        .form-hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.35rem;
+        }
+
         @media (max-width: 768px) {
             .sidebar { width: 240px; }
             .main-content { margin-left: 0; }
@@ -545,6 +584,16 @@
             </div>
             <div class="product-modal-body">
                 <form class="product-form" id="addProductForm">
+                    <input type="hidden" id="barcodeWasGenerated" name="barcodeWasGenerated" value="0">
+                    <div class="form-group">
+                        <label for="addBarcode">Barcode</label>
+                        <div class="barcode-row">
+                            <input type="text" id="addBarcode" name="barcode" placeholder="Quét hoặc nhập / tự sinh mã" autocomplete="off">
+                            <button type="button" id="btnScanBarcode" class="btn-scan" title="Focus field for scanner">Quét mã</button>
+                            <button type="button" id="btnGenerateBarcode" class="btn-generate" title="Generate unique barcode">Tự sinh mã</button>
+                        </div>
+                        <div class="form-hint">Quét bằng máy hoặc bấm Tự sinh mã cho hàng không có mã (vd: rau củ).</div>
+                    </div>
                     <div class="form-group">
                         <label for="productBatch">Product Batch</label>
                         <input type="text" id="productBatch" name="productBatch" placeholder="e.g Jan-2023 Ba">
@@ -712,9 +761,7 @@
             if (openAddBtn) openAddBtn.addEventListener('click', function (e) { e.preventDefault(); openAddModal(); });
             if (closeAddBtn) closeAddBtn.addEventListener('click', closeAddModal);
             if (cancelAddBtn) cancelAddBtn.addEventListener('click', closeAddModal);
-            if (submitAddBtn) submitAddBtn.addEventListener('click', function () {
-                closeAddModal();
-            });
+            if (submitAddBtn) submitAddBtn.addEventListener('click', function (e) { e.preventDefault(); closeAddModal(); });
             addModal.addEventListener('click', function (e) {
                 if (e.target === addModal) closeAddModal();
             });

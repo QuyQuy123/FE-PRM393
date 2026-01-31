@@ -136,6 +136,45 @@
             transition: all 0.2s ease;
         }
         .btn-submit:hover { background: #15803d; }
+
+        .barcode-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+        .barcode-row .form-input {
+            flex: 1;
+            min-width: 180px;
+        }
+        .btn-scan, .btn-generate {
+            padding: 0.65rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+        .btn-scan {
+            background: #0d9488;
+            color: white;
+        }
+        .btn-scan:hover { background: #0f766e; }
+        .btn-generate {
+            background: #667eea;
+            color: white;
+        }
+        .btn-generate:hover { background: #5a67d8; }
+        .form-hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.35rem;
+        }
     </style>
 </head>
 <body>
@@ -147,6 +186,16 @@
             </div>
             <div class="modal-body">
                 <form class="product-form" id="addProductForm" action="ListProduct.html" method="get">
+                    <input type="hidden" id="barcodeWasGenerated" name="barcodeWasGenerated" value="0">
+                    <div class="form-group">
+                        <label for="barcode" class="form-label">Barcode</label>
+                        <div class="barcode-row">
+                            <input type="text" id="barcode" name="barcode" class="form-input" placeholder="Quét hoặc nhập / tự sinh mã" autocomplete="off">
+                            <button type="button" id="btnScanBarcode" class="btn-scan" title="Focus field for scanner">Quét mã</button>
+                            <button type="button" id="btnGenerateBarcode" class="btn-generate" title="Generate unique barcode">Tự sinh mã</button>
+                        </div>
+                        <div class="form-hint">Quét bằng máy hoặc bấm Tự sinh mã cho hàng không có mã (vd: rau củ).</div>
+                    </div>
                     <div class="form-group">
                         <label for="productBatch" class="form-label">Product Batch</label>
                         <input type="text" id="productBatch" name="productBatch" class="form-input" placeholder="e.g Jan-2023 Ba">
@@ -213,9 +262,105 @@
             </div>
             <div class="modal-footer">
                 <a href="ListProduct.html" class="btn-cancel">Cancel</a>
-                <button type="submit" form="addProductForm" class="btn-submit">Submit</button>
+                <button type="submit" form="addProductForm" class="btn-submit" id="btnSubmit">Save</button>
             </div>
         </div>
     </div>
+
+    <script>
+        (function () {
+            var BARCODE_STORAGE_KEY = 'pos_generated_barcodes';
+            var BARCODE_PREFIX = '200';
+            var barcodeInput = document.getElementById('barcode');
+            var barcodeWasGenerated = document.getElementById('barcodeWasGenerated');
+            var btnScan = document.getElementById('btnScanBarcode');
+            var btnGenerate = document.getElementById('btnGenerateBarcode');
+            var form = document.getElementById('addProductForm');
+
+            // Step 1: Auto-focus Barcode when page loads (user can scan immediately)
+            barcodeInput.focus();
+
+            function getUsedBarcodes() {
+                try {
+                    var raw = sessionStorage.getItem(BARCODE_STORAGE_KEY);
+                    return raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    return [];
+                }
+            }
+            function saveUsedBarcodes(arr) {
+                try {
+                    sessionStorage.setItem(BARCODE_STORAGE_KEY, JSON.stringify(arr));
+                } catch (e) {}
+            }
+            function nextUniqueBarcode() {
+                var used = getUsedBarcodes();
+                var num = 200001;
+                used.forEach(function (s) {
+                    var n = parseInt(s, 10);
+                    if (!isNaN(n) && n >= num) num = n + 1;
+                });
+                var code = String(num);
+                used.push(code);
+                saveUsedBarcodes(used);
+                return code;
+            }
+
+            // Scan: focus barcode field so scanner (keyboard wedge) fills it
+            btnScan.addEventListener('click', function () {
+                barcodeInput.focus();
+                barcodeWasGenerated.value = '0';
+                // Optional: show short message
+                var msg = document.createElement('span');
+                msg.textContent = 'Sẵn sàng quét';
+                msg.style.cssText = 'position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:#0d9488;color:#fff;padding:0.5rem 1rem;border-radius:8px;font-size:0.875rem;z-index:9999;';
+                document.body.appendChild(msg);
+                setTimeout(function () { msg.remove(); }, 1500);
+            });
+
+            // Generate: assign unique barcode (e.g. 200001, 200002, ...)
+            btnGenerate.addEventListener('click', function () {
+                var code = nextUniqueBarcode();
+                barcodeInput.value = code;
+                barcodeWasGenerated.value = '1';
+                barcodeInput.focus();
+            });
+
+            // If user types or scans manually, mark as not auto-generated
+            barcodeInput.addEventListener('input', function () {
+                barcodeWasGenerated.value = '0';
+            });
+            barcodeInput.addEventListener('keydown', function () {
+                barcodeWasGenerated.value = '0';
+            });
+
+            // On Save: if barcode was auto-generated, ask "Print barcode label now?"
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var barcode = (barcodeInput.value || '').trim();
+                if (!barcode) {
+                    alert('Vui lòng nhập hoặc tự sinh mã barcode.');
+                    barcodeInput.focus();
+                    return;
+                }
+                var generated = barcodeWasGenerated.value === '1';
+
+                if (generated) {
+                    var printNow = confirm('Bạn có muốn in tem mã vạch ngay không?');
+                    if (printNow) {
+                        var w = window.open('', '_blank', 'width=400,height=300');
+                        w.document.write(
+                            '<!DOCTYPE html><html><head><title>Barcode Label</title></head><body style="font-family:sans-serif;padding:2rem;text-align:center;">' +
+                            '<h2>Barcode</h2><p style="font-size:1.5rem;font-weight:bold;letter-spacing:0.1em;">' + barcode + '</p>' +
+                            '<p style="font-size:0.9rem;color:#666;">Product: ' + (document.getElementById('productName').value || '—') + '</p>' +
+                            '<script>window.onload=function(){window.print();window.close();}<\/script></body></html>'
+                        );
+                        w.document.close();
+                    }
+                }
+                window.location.href = 'ListProduct.html';
+            });
+        })();
+    </script>
 </body>
 </html>

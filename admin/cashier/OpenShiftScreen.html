@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Shift - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+
+        .content {
+            padding: 2rem;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .open-shift-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e8eaed;
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+        }
+        .open-shift-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+            color: white;
+        }
+        .open-shift-header h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .open-shift-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.35rem;
+        }
+        .open-shift-body {
+            padding: 2rem;
+        }
+        .form-row {
+            margin-bottom: 1.5rem;
+        }
+        .form-row:last-of-type { margin-bottom: 0; }
+        .form-row label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        .form-row .field-value {
+            padding: 0.75rem 1rem;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #1a1d21;
+            font-weight: 500;
+        }
+        .form-row input[type="text"],
+        .form-row input[type="number"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-row input:focus {
+            outline: none;
+            border-color: #0d9488;
+            box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+        }
+        .form-hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.35rem;
+        }
+        .open-shift-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #e8eaed;
+            background: #f9fafb;
+        }
+        .btn-start-shift {
+            width: 100%;
+            background: #0d9488;
+            color: white;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .btn-start-shift:hover {
+            background: #0f766e;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 240px; }
+            .content { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="../barcodeScanner/BarcodeScanner.html">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../creditors/Creditors.html">Creditors</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right"></div>
+        </div>
+
+        <div class="content">
+            <div class="open-shift-card">
+                <div class="open-shift-header">
+                    <h1>Open Shift</h1>
+                    <p>Enter your opening cash amount to start your shift.</p>
+                </div>
+                <div class="open-shift-body">
+                    <div class="form-row">
+                        <label>Employee name</label>
+                        <div class="field-value" id="displayEmployeeName">John Smith</div>
+                    </div>
+                    <div class="form-row">
+                        <label>Login time</label>
+                        <div class="field-value" id="displayLoginTime">—</div>
+                    </div>
+                    <div class="form-row">
+                        <label for="initialCash">Initial cash amount</label>
+                        <input type="text" id="initialCash" placeholder="Enter opening cash (e.g. 1000000)" inputmode="numeric" autocomplete="off">
+                        <div class="form-hint">Total cash in drawer at the start of your shift.</div>
+                    </div>
+                </div>
+                <div class="open-shift-footer">
+                    <button type="button" class="btn-start-shift" id="btnStartShift">Confirm &amp; start shift</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var loginTime = new Date();
+            document.getElementById('displayLoginTime').textContent = loginTime.toLocaleString('en-US', {
+                dateStyle: 'medium',
+                timeStyle: 'medium'
+            });
+
+            // Optional: get employee name from sessionStorage (set by login page)
+            var savedName = sessionStorage.getItem('pos_employee_name');
+            if (savedName) {
+                document.getElementById('displayEmployeeName').textContent = savedName;
+            }
+
+            document.getElementById('btnStartShift').addEventListener('click', function () {
+                var input = document.getElementById('initialCash');
+                var value = (input.value || '').replace(/,/g, '').replace(/\s/g, '').trim();
+                if (!value || isNaN(parseFloat(value))) {
+                    alert('Please enter a valid initial cash amount.');
+                    input.focus();
+                    return;
+                }
+                var amount = parseFloat(value);
+                if (amount < 0) {
+                    alert('Initial cash cannot be negative.');
+                    return;
+                }
+                try {
+                    sessionStorage.setItem('pos_open_shift_time', loginTime.toISOString());
+                    sessionStorage.setItem('pos_initial_cash', String(amount));
+                    window.location.href = '../barcodeScanner/BarcodeScanner.html';
+                } catch (e) {
+                    alert('Could not save. Please try again.');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

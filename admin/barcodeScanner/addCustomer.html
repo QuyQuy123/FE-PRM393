@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Customer (Tích điểm) - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #0d9488;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #d97706;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1d21;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+        .form-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8eaed;
+            max-width: 480px;
+            padding: 1.5rem;
+        }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #1a1d21;
+            font-family: inherit;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        .form-group input[readonly] {
+            background: #f9fafb;
+            color: #6b7280;
+        }
+        .form-group .hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        .btn-cancel {
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #dc2626;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-cancel:hover { background: #b91c1c; }
+        .btn-submit {
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #16a34a;
+            color: white;
+        }
+        .btn-submit:hover { background: #15803d; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 0; }
+            .content { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="BarcodeScanner.html" class="active">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../creditors/Creditors.html">Creditors</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge">11:20:00 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">John Smith</div>
+                        <div class="role">Cashier</div>
+                    </div>
+                    <div class="user-avatar">D</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <a href="BarcodeScanner.html" class="back-link">← Back to POS</a>
+            <h1 class="page-title">Add khách hàng để tích điểm</h1>
+
+            <div class="form-card">
+                <form id="addCustomerForm">
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="text" id="phone" name="phone" placeholder="VD: 0901234567">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerName">Tên khách hàng</label>
+                        <input type="text" id="customerName" name="customerName" placeholder="VD: Nguyễn Văn A">
+                    </div>
+                    <div class="form-group">
+                        <label for="totalAmount">Tổng tiền (từ bill)</label>
+                        <input type="text" id="totalAmount" name="totalAmount" placeholder="0" readonly>
+                        <div class="hint">Tổng tiền được lấy từ hóa đơn tại màn hình POS.</div>
+                    </div>
+                    <div class="form-actions">
+                        <a href="BarcodeScanner.html" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit">Lưu & tích điểm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var total = params.get('total') || '0';
+            var phone = params.get('phone') || '';
+            var name = params.get('name') || '';
+
+            document.getElementById('phone').value = phone;
+            document.getElementById('customerName').value = name;
+            var totalNum = parseFloat(total) || 0;
+            document.getElementById('totalAmount').value = totalNum.toLocaleString('vi-VN') + 'đ';
+
+            document.getElementById('addCustomerForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                var p = document.getElementById('phone').value.trim();
+                var n = document.getElementById('customerName').value.trim();
+                if (!p) {
+                    alert('Vui lòng nhập số điện thoại.');
+                    return;
+                }
+                if (!n) {
+                    alert('Vui lòng nhập tên khách hàng.');
+                    return;
+                }
+                alert('Đã lưu khách hàng và tích điểm (demo).');
+                window.location.href = 'BarcodeScanner.html';
+            });
+        })();
+    </script>
+</body>
+</html>
