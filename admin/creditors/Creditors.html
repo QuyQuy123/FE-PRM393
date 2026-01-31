@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Discount - POS System</title>
+    <title>Credit Sales Records - POS System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -99,7 +99,7 @@
         }
         .header-right { display: flex; align-items: center; gap: 1.25rem; }
         .time-badge {
-            background: #667eea;
+            background: #16a34a;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 8px;
@@ -109,8 +109,8 @@
         .user-info { display: flex; align-items: center; gap: 0.75rem; }
         .user-avatar {
             width: 40px; height: 40px;
-            background: #667eea;
-            border-radius: 10px;
+            background: #d97706;
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: white; font-weight: 600; font-size: 0.9rem;
         }
@@ -119,90 +119,67 @@
         .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
 
         .content { padding: 2rem; flex: 1; overflow-y: auto; }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-        }
-        .back-link:hover { text-decoration: underline; }
-        .page-title {
+        .content-title {
             font-size: 1.5rem;
             font-weight: 700;
             color: #1a1d21;
             letter-spacing: -0.02em;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
         }
-        .form-card {
+
+        .table-container {
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
             border: 1px solid #e8eaed;
-            max-width: 480px;
-            padding: 1.5rem;
         }
-        .form-group { margin-bottom: 1.25rem; }
-        .form-group label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.4rem;
-        }
-        .form-group input {
+        .table {
             width: 100%;
-            padding: 0.7rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+        .table th,
+        .table td {
+            padding: 0.875rem 1rem;
+            vertical-align: middle;
+            font-size: 0.875rem;
+        }
+        .table th {
+            background: #f7f8fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .table td { color: #374151; }
+        .table tbody tr:hover { background: #f7f8fa; }
+
+        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; min-width: 7rem; }
+        .table th:nth-child(2), .table td:nth-child(2) { text-align: left; min-width: 10rem; }
+        .table th:nth-child(3), .table td:nth-child(3) { text-align: left; min-width: 10rem; }
+        .table th:nth-child(4), .table td:nth-child(4) { text-align: right; min-width: 6rem; }
+        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; min-width: 6rem; }
+        .table th:nth-child(6), .table td:nth-child(6) { text-align: right; min-width: 6rem; }
+        .table th:nth-child(7), .table td:nth-child(7) { text-align: left; min-width: 5rem; }
+        .table th:nth-child(8), .table td:nth-child(8) { text-align: center; min-width: 8rem; }
+        .table th:nth-child(9), .table td:nth-child(9) { text-align: center; min-width: 8rem; }
+
+        .no-records {
+            padding: 2rem;
+            text-align: center;
+            color: #b91c1c;
+            font-weight: 600;
             font-size: 0.95rem;
-            color: #1a1d21;
-            font-family: inherit;
         }
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
-        }
-        .form-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-        }
-        .btn-cancel {
-            padding: 0.65rem 1.25rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            background: #dc2626;
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-        }
-        .btn-cancel:hover { background: #b91c1c; }
-        .btn-submit {
-            padding: 0.65rem 1.25rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            background: #16a34a;
-            color: white;
-        }
-        .btn-submit:hover { background: #15803d; }
 
         @media (max-width: 768px) {
             .sidebar { width: 240px; }
             .main-content { margin-left: 0; }
             .header { padding: 1rem; }
             .content { padding: 1rem; }
+            .table-container { overflow-x: auto; }
         }
     </style>
 </head>
@@ -217,13 +194,13 @@
                 <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
                 <li><a href="../user/users.html">Users</a></li>
                 <li><a href="../customer/ListCustomer.html">Customer</a></li>
-                <li><a href="Discount.html" class="active">Discount</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
                 <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
                 <li><a href="../category/ListCategory.html">Category</a></li>
                 <li><a href="../product/ListProduct.html">Products</a></li>
                 <li><a href="#">Barcode Scanner</a></li>
                 <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
-                <li><a href="../creditors/Creditors.html">Creditors</a></li>
+                <li><a href="Creditors.html" class="active">Creditors</a></li>
                 <li><a href="../expired/Expired.html">Expired</a></li>
                 <li><a href="../report/report.html">Reports</a></li>
             </ul>
@@ -236,57 +213,95 @@
     <div class="main-content">
         <div class="header">
             <div class="header-right">
-                <div class="time-badge">11:20:00 AM</div>
+                <div class="time-badge">11:17:26 AM</div>
                 <div class="user-info">
                     <div class="user-details">
                         <div class="name">kodemade</div>
                         <div class="role">Administrator</div>
                     </div>
-                    <div class="user-avatar">K</div>
+                    <div class="user-avatar">D</div>
                 </div>
             </div>
         </div>
 
         <div class="content">
-            <a href="Discount.html" class="back-link">← Back to Discount List</a>
-            <h1 class="page-title">Add Discount</h1>
+            <h1 class="content-title">Credit Sales Records</h1>
 
-            <div class="form-card">
-                <form id="addDiscountForm">
-                    <div class="form-group">
-                        <label for="name">Discount Name</label>
-                        <input type="text" id="name" name="name" placeholder="e.g. Holiday Special">
-                    </div>
-                    <div class="form-group">
-                        <label for="percent">Discount %</label>
-                        <input type="text" id="percent" name="percent" placeholder="e.g. 5">
-                    </div>
-                    <div class="form-group">
-                        <label for="minOrder">Min Order Amount (đ)</label>
-                        <input type="text" id="minOrder" name="minOrder" placeholder="e.g. 500000">
-                    </div>
-                    <div class="form-group">
-                        <label for="startDate">Start Date</label>
-                        <input type="text" id="startDate" name="startDate" placeholder="DD/MM/YYYY">
-                    </div>
-                    <div class="form-group">
-                        <label for="endDate">End Date</label>
-                        <input type="text" id="endDate" name="endDate" placeholder="DD/MM/YYYY">
-                    </div>
-                    <div class="form-actions">
-                        <a href="Discount.html" class="btn-cancel">Cancel</a>
-                        <button type="submit" class="btn-submit">Submit</button>
-                    </div>
-                </form>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Invoice No</th>
+                            <th>Customer Name</th>
+                            <th>Phone</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Balance</th>
+                            <th>Cashier</th>
+                            <th>Date</th>
+                            <th>Pay Due</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>INV-2025-001</td>
+                            <td>Nguyen Van A</td>
+                            <td>0901234567</td>
+                            <td>đ250,000</td>
+                            <td>đ150,000</td>
+                            <td>đ100,000</td>
+                            <td>John</td>
+                            <td>02/01/2025</td>
+                            <td>15/01/2025</td>
+                        </tr>
+                        <tr>
+                            <td>INV-2025-002</td>
+                            <td>Tran Thi B</td>
+                            <td>0123456789</td>
+                            <td>đ420,000</td>
+                            <td>đ200,000</td>
+                            <td>đ220,000</td>
+                            <td>Jane</td>
+                            <td>05/01/2025</td>
+                            <td>20/01/2025</td>
+                        </tr>
+                        <tr>
+                            <td>INV-2025-003</td>
+                            <td>Le Van C</td>
+                            <td>0912345678</td>
+                            <td>đ185,000</td>
+                            <td>đ85,000</td>
+                            <td>đ100,000</td>
+                            <td>John</td>
+                            <td>08/01/2025</td>
+                            <td>22/01/2025</td>
+                        </tr>
+                        <tr>
+                            <td>INV-2025-004</td>
+                            <td>Pham Thi D</td>
+                            <td>0923456789</td>
+                            <td>đ560,000</td>
+                            <td>đ300,000</td>
+                            <td>đ260,000</td>
+                            <td>Jane</td>
+                            <td>10/01/2025</td>
+                            <td>25/01/2025</td>
+                        </tr>
+                        <tr>
+                            <td>INV-2025-005</td>
+                            <td>Hoang Van E</td>
+                            <td>0989149426</td>
+                            <td>đ310,000</td>
+                            <td>đ110,000</td>
+                            <td>đ200,000</td>
+                            <td>John</td>
+                            <td>12/01/2025</td>
+                            <td>28/01/2025</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('addDiscountForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            window.location.href = 'Discount.html';
-        });
-    </script>
 </body>
 </html>

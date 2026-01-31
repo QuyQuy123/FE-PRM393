@@ -205,9 +205,15 @@
             width: 4rem;
             text-align: center;
         }
-        /* Cột 2: Phone */
+        /* Cột 2: Customer */
         .table th:nth-child(2),
         .table td:nth-child(2) {
+            width: 12rem;
+            text-align: left;
+        }
+        /* Cột 3: Phone */
+        .table th:nth-child(3),
+        .table td:nth-child(3) {
             width: 10rem;
             text-align: left;
         }
@@ -217,35 +223,35 @@
             font-weight: 600;
         }
         .phone-link:hover { text-decoration: underline; }
-        /* Cột 3: Points */
-        .table th:nth-child(3),
-        .table td:nth-child(3) {
-            width: 7rem;
-            text-align: right;
-        }
-        /* Cột 4: Purchases */
+        /* Cột 4: Points */
         .table th:nth-child(4),
         .table td:nth-child(4) {
             width: 7rem;
             text-align: right;
         }
-        /* Cột 5: Total Amount */
+        /* Cột 5: Purchases */
         .table th:nth-child(5),
         .table td:nth-child(5) {
+            width: 7rem;
+            text-align: right;
+        }
+        /* Cột 6: Total Amount */
+        .table th:nth-child(6),
+        .table td:nth-child(6) {
             width: 11rem;
             text-align: right;
             font-weight: 500;
         }
-        /* Cột 6: Discount */
-        .table th:nth-child(6),
-        .table td:nth-child(6) {
+        /* Cột 7: Discount */
+        .table th:nth-child(7),
+        .table td:nth-child(7) {
             width: 6rem;
             text-align: right;
             font-weight: 500;
         }
-        /* Cột 7: Actions */
-        .table th:nth-child(7),
-        .table td:nth-child(7) {
+        /* Cột 8: Actions */
+        .table th:nth-child(8),
+        .table td:nth-child(8) {
             width: 6rem;
             text-align: center;
         }
@@ -384,6 +390,7 @@
                 <li><a href="../product/ListProduct.html">Products</a></li>
                 <li><a href="#">Barcode Scanner</a></li>
                 <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../creditors/Creditors.html">Creditors</a></li>
                 <li><a href="../expired/Expired.html">Expired</a></li>
                 <li><a href="../report/report.html">Reports</a></li>
             </ul>
@@ -420,6 +427,7 @@
                     <thead>
                         <tr>
                             <th>S/N</th>
+                            <th>Customer</th>
                             <th>Phone</th>
                             <th>Points</th>
                             <th>Purchases</th>
@@ -431,6 +439,7 @@
                     <tbody>
                         <tr>
                             <td>1</td>
+                            <td>Nguyen Van A</td>
                             <td><a href="ViewCustomerHistory.html?phone=0901234567" class="phone-link">0901234567</a></td>
                             <td>1,250</td>
                             <td>18</td>
@@ -440,6 +449,7 @@
                         </tr>
                         <tr>
                             <td>2</td>
+                            <td>Tran Thi B</td>
                             <td><a href="ViewCustomerHistory.html?phone=0912345678" class="phone-link">0912345678</a></td>
                             <td>820</td>
                             <td>12</td>
@@ -449,6 +459,7 @@
                         </tr>
                         <tr>
                             <td>3</td>
+                            <td>Le Van C</td>
                             <td><a href="ViewCustomerHistory.html?phone=0923456789" class="phone-link">0923456789</a></td>
                             <td>450</td>
                             <td>7</td>
@@ -458,6 +469,7 @@
                         </tr>
                         <tr>
                             <td>4</td>
+                            <td>Pham Thi D</td>
                             <td><a href="ViewCustomerHistory.html?phone=0934567890" class="phone-link">0934567890</a></td>
                             <td>2,100</td>
                             <td>32</td>
@@ -467,6 +479,7 @@
                         </tr>
                         <tr>
                             <td>5</td>
+                            <td>Hoang Van E</td>
                             <td><a href="ViewCustomerHistory.html?phone=0945678901" class="phone-link">0945678901</a></td>
                             <td>120</td>
                             <td>3</td>

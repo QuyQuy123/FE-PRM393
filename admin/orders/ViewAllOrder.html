@@ -160,14 +160,14 @@
 
         .table th:nth-child(1), .table td:nth-child(1) { text-align: left; min-width: 6rem; }
         .table th:nth-child(2), .table td:nth-child(2) { text-align: left; min-width: 10rem; }
-        .table th:nth-child(3), .table td:nth-child(3) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(4), .table td:nth-child(4) { text-align: right; min-width: 4rem; }
-        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; min-width: 5rem; }
+        .table th:nth-child(3), .table td:nth-child(3) { text-align: left; min-width: 10rem; }
+        .table th:nth-child(4), .table td:nth-child(4) { text-align: right; min-width: 5rem; }
+        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; min-width: 4rem; }
         .table th:nth-child(6), .table td:nth-child(6) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(7), .table td:nth-child(7) { text-align: left; min-width: 5rem; }
+        .table th:nth-child(7), .table td:nth-child(7) { text-align: right; min-width: 5rem; }
         .table th:nth-child(8), .table td:nth-child(8) { text-align: left; min-width: 5rem; }
         .table th:nth-child(9), .table td:nth-child(9) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(10), .table td:nth-child(10) { text-align: left; min-width: 10rem; }
+        .table th:nth-child(10), .table td:nth-child(10) { text-align: left; min-width: 5rem; }
         .table th:nth-child(11), .table td:nth-child(11) { text-align: center; min-width: 5rem; }
 
         .status-badge {
@@ -207,6 +207,7 @@
                 <li><a href="../product/ListProduct.html">Products</a></li>
                 <li><a href="#">Barcode Scanner</a></li>
                 <li><a href="ViewAllOrder.html" class="active">Orders</a></li>
+                <li><a href="../creditors/Creditors.html">Creditors</a></li>
                 <li><a href="../expired/Expired.html">Expired</a></li>
                 <li><a href="../report/report.html">Reports</a></li>
             </ul>
@@ -238,6 +239,7 @@
                     <thead>
                         <tr>
                             <th>Order ID</th>
+                            <th>Customer</th>
                             <th>Phone</th>
                             <th>Total</th>
                             <th>Discount (%)</th>
@@ -246,13 +248,13 @@
                             <th>Payment</th>
                             <th>Status</th>
                             <th>Cashier</th>
-                            <th>Payment Time</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>ORD-001</td>
+                            <td>Nguyen Van A</td>
                             <td>0901234567</td>
                             <td>đ125,000</td>
                             <td>5</td>
@@ -261,11 +263,11 @@
                             <td>Card</td>
                             <td><span class="status-badge status-paid">Paid</span></td>
                             <td>John</td>
-                            <td>10:15 AM, 02/01/2025</td>
                             <td><a href="ViewOrderDetail.html?id=1">View</a></td>
                         </tr>
                         <tr>
                             <td>ORD-002</td>
+                            <td>Tran Thi B</td>
                             <td>0987463212</td>
                             <td>đ85,400</td>
                             <td>0</td>
@@ -274,11 +276,11 @@
                             <td>Cash</td>
                             <td><span class="status-badge status-paid">Paid</span></td>
                             <td>Jane</td>
-                            <td>14:30, 03/01/2025</td>
                             <td><a href="ViewOrderDetail.html?id=2">View</a></td>
                         </tr>
                         <tr>
                             <td>ORD-003</td>
+                            <td>Le Van C</td>
                             <td>0912345678</td>
                             <td>đ250,000</td>
                             <td>10</td>
@@ -287,11 +289,11 @@
                             <td>—</td>
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>John</td>
-                            <td>09:00 AM, 04/01/2025</td>
                             <td><a href="ViewOrderDetail.html?id=3">View</a></td>
                         </tr>
                         <tr>
                             <td>ORD-004</td>
+                            <td>Pham Thi D</td>
                             <td>0923456789</td>
                             <td>đ45,200</td>
                             <td>3</td>
@@ -300,7 +302,6 @@
                             <td>Transfer</td>
                             <td><span class="status-badge status-paid">Paid</span></td>
                             <td>Jane</td>
-                            <td>16:45, 05/01/2025</td>
                             <td><a href="ViewOrderDetail.html?id=4">View</a></td>
                         </tr>
                     </tbody>
