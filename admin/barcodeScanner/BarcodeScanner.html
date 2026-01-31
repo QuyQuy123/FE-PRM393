@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #1a1d21;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .sidebar-header {
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            width: 36px; height: 36px;
+            background: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
+        }
+        .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
+        .sidebar-content { flex: 1; display: flex; flex-direction: column; }
+        .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
+        .sidebar-menu li { margin-bottom: 0; }
+        .sidebar-menu a {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-left: 3px solid rgba(255, 255, 255, 0.9);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+            color: white;
+            border-left: 3px solid white;
+            font-weight: 600;
+        }
+        .sidebar-footer {
+            padding: 0.5rem 0 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            display: block;
+            padding: 0.95rem 1.5rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+        }
+        .logout-btn:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .header-right { display: flex; align-items: center; gap: 1.25rem; }
+        .time-badge {
+            background: #0d9488;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .user-info { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #d97706;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
+        }
+        .user-details { font-size: 0.9rem; }
+        .user-details .name { font-weight: 600; color: #1a1d21; }
+        .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
+
+        .content {
+            padding: 2rem;
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+        .pos-watermark {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.08);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .customer-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+        .customer-row label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .customer-row input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 220px;
+        }
+        .customer-row input:focus {
+            outline: none;
+            border-color: #0d9488;
+            box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+        }
+
+        .action-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+        .btn-add-cart {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-add-cart:hover { background: #15803d; }
+        .btn-scan {
+            background: #0d9488;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-scan:hover { background: #0f766e; }
+        .barcode-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .barcode-input-wrap input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            width: 200px;
+        }
+        .search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .search-wrap label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .search-wrap input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 240px;
+        }
+        .search-wrap input:focus {
+            outline: none;
+            border-color: #0d9488;
+        }
+        .search-wrap { position: relative; }
+        .link-search-page {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0d9488;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .link-search-page:hover { text-decoration: underline; }
+
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e8eaed;
+            margin-bottom: 1.25rem;
+        }
+        .table-header {
+            background: #7dd3fc;
+            color: #1a1d21;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .table-header,
+        .cart-table td {
+            padding: 0.75rem 1rem;
+        }
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .cart-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+        }
+        .cart-table td {
+            border-top: 1px solid #e8eaed;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+        .cart-table tbody tr:hover { background: #f8fafc; }
+        .cart-table .col-name { min-width: 12rem; }
+        .cart-table .col-stock { min-width: 6rem; }
+        .cart-table .col-price { min-width: 7rem; text-align: right; }
+        .cart-table .col-qty { min-width: 7rem; text-align: center; }
+        .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+        }
+        .btn-qty {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+            line-height: 1;
+            padding: 0;
+        }
+        .btn-qty:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        .qty-value {
+            min-width: 2rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .cart-table .col-subtotal { min-width: 8rem; text-align: right; font-weight: 600; }
+        .cart-table .col-remove { width: 4rem; text-align: center; }
+        .btn-remove {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .btn-remove:hover { background: #b91c1c; }
+
+        .grand-total-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .grand-total-row label {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1a1d21;
+        }
+        .grand-total-row input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            min-width: 140px;
+        }
+        .discount-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .btn-discount {
+            background: #0d9488;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .btn-discount:hover { background: #0f766e; }
+        .discount-row input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            width: 120px;
+        }
+
+        .payment-section {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .payment-field {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .payment-field label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #374151;
+            min-width: 6rem;
+        }
+        .payment-field select,
+        .payment-field input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 180px;
+        }
+        .btn-invoice {
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 0.65rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .btn-invoice:hover { background: #1f2937; }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            min-width: 280px;
+            background: #fff;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+        .search-results.show { display: block; }
+        .search-results .item {
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9rem;
+        }
+        .search-results .item:hover { background: #f0f9ff; }
+        .search-results .item:last-child { border-bottom: none; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 260px; }
+            .content { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">P</div>
+            <div class="sidebar-title">POS SYSTEM</div>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
+                <li><a href="../user/users.html">Users</a></li>
+                <li><a href="../customer/ListCustomer.html">Customer</a></li>
+                <li><a href="../discount/Discount.html">Discount</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../product/ListProduct.html">Products</a></li>
+                <li><a href="BarcodeScanner.html" class="active">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="../creditors/Creditors.html">Creditors</a></li>
+                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="../report/report.html">Reports</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../../systemAccessSecurity/login.html" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-right">
+                <div class="time-badge" id="headerTime">11:18:40 AM</div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="name">John Smith</div>
+                        <div class="role">Cashier</div>
+                    </div>
+                    <div class="user-avatar">D</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="customer-row">
+                <label>Customer Name: <input type="text" id="customerName" placeholder="Optional [Required for credit sales]"></label>
+                <label>Phone: <input type="text" id="customerPhone" placeholder="Optional [Required for credit sales]"></label>
+            </div>
+
+            <div class="action-row">
+                <button type="button" class="btn-add-cart" id="btnAddToCart">+ Add To Cart</button>
+                <button type="button" class="btn-scan" id="btnScanBarcode">Quét mã sản phẩm</button>
+                <div class="barcode-input-wrap">
+                    <input type="text" id="barcodeInput" placeholder="Quét hoặc nhập mã vạch..." autocomplete="off">
+                </div>
+                <div class="search-wrap">
+                    <label>Search sản phẩm:</label>
+                    <input type="text" id="searchProduct" placeholder="Tìm tên hoặc mã sản phẩm..." autocomplete="off">
+                    <a href="#" id="linkSearchPage" class="link-search-page">Xem trang tìm kiếm</a>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="cart-table">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="col-name">Product Name</th>
+                            <th class="col-stock">Stock Qty</th>
+                            <th class="col-price">Unit Price</th>
+                            <th class="col-qty">Qty</th>
+                            <th class="col-subtotal">Subtotal</th>
+                            <th class="col-remove"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartBody"></tbody>
+                </table>
+            </div>
+
+            <div class="grand-total-row">
+                <label>Grand Total</label>
+                <input type="text" id="grandTotal" readonly value="0đ">
+            </div>
+            <div class="discount-row">
+                <button type="button" class="btn-discount" id="btnApplyDiscount">Apply Discount</button>
+                <input type="number" id="discountPercent" placeholder="discount e.g 4" min="0" max="100" value="">
+            </div>
+
+            <div class="payment-section">
+                <div class="payment-field">
+                    <label>Payment Method</label>
+                    <select id="paymentMethod">
+                        <option value="">Select...</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Card">Card</option>
+                        <option value="Transfer">Transfer</option>
+                        <option value="POS">POS</option>
+                    </select>
+                </div>
+                <div class="payment-field">
+                    <label>Amount Tender</label>
+                    <input type="text" id="amountTender" placeholder="Enter amount paid">
+                </div>
+                <button type="button" class="btn-invoice" id="btnGenerateInvoice">Generate Invoice</button>
+            </div>
+        </div>
+
+        <div class="pos-watermark">POINT OF SALES SYSTEM BY KODEMAGAZY</div>
+    </div>
+
+    <script>
+        (function () {
+            var productsByBarcode = {
+                '8901234567890': { name: 'Anni Item1', stock: 50, price: 85000 },
+                '8901234567891': { name: 'BD item1', stock: 30, price: 120000 },
+                '8901234567892': { name: 'Wed Item1', stock: 45, price: 95000 },
+                '8901234567893': { name: 'Product D', stock: 20, price: 150000 },
+                '8901234567894': { name: 'Product E', stock: 60, price: 45000 }
+            };
+            var productsList = [
+                { barcode: '8901234567890', name: 'Anni Item1', stock: 50, price: 85000 },
+                { barcode: '8901234567891', name: 'BD item1', stock: 30, price: 120000 },
+                { barcode: '8901234567892', name: 'Wed Item1', stock: 45, price: 95000 },
+                { barcode: '8901234567893', name: 'Product D', stock: 20, price: 150000 },
+                { barcode: '8901234567894', name: 'Product E', stock: 60, price: 45000 }
+            ];
+
+            var cart = [];
+            var discountPercent = 0;
+
+            // Demo: 5 sản phẩm trong giỏ
+            cart = [
+                { barcode: '8901234567890', name: 'Anni Item1', stock: 50, price: 85000, qty: 2 },
+                { barcode: '8901234567891', name: 'BD item1', stock: 30, price: 120000, qty: 1 },
+                { barcode: '8901234567892', name: 'Wed Item1', stock: 45, price: 95000, qty: 3 },
+                { barcode: '8901234567893', name: 'Product D', stock: 20, price: 150000, qty: 1 },
+                { barcode: '8901234567894', name: 'Product E', stock: 60, price: 45000, qty: 2 }
+            ];
+
+            function addToCart(product, qty) {
+                qty = qty || 1;
+                var existing = cart.find(function (p) { return p.barcode === product.barcode; });
+                if (existing) {
+                    existing.qty += qty;
+                } else {
+                    cart.push({
+                        barcode: product.barcode,
+                        name: product.name,
+                        stock: product.stock,
+                        price: product.price,
+                        qty: qty
+                    });
+                }
+                renderCart();
+            }
+
+            function removeFromCart(barcode) {
+                cart = cart.filter(function (p) { return p.barcode !== barcode; });
+                renderCart();
+            }
+
+            function updateQty(barcode, delta) {
+                var item = cart.find(function (p) { return p.barcode === barcode; });
+                if (!item) return;
+                item.qty += delta;
+                if (item.qty <= 0) removeFromCart(barcode);
+                else renderCart();
+            }
+
+            function renderCart() {
+                var tbody = document.getElementById('cartBody');
+                var total = 0;
+                var html = '';
+                cart.forEach(function (p) {
+                    var subtotal = p.price * p.qty;
+                    total += subtotal;
+                    html += '<tr data-barcode="' + p.barcode + '">' +
+                        '<td class="col-name">' + p.name + '</td>' +
+                        '<td class="col-stock">' + p.stock + '</td>' +
+                        '<td class="col-price">' + (p.price).toLocaleString('vi-VN') + 'đ</td>' +
+                        '<td class="col-qty"><div class="qty-controls"><button type="button" class="btn-qty btn-qty-minus" data-barcode="' + p.barcode + '" aria-label="Giảm">−</button><span class="qty-value">' + p.qty + '</span><button type="button" class="btn-qty btn-qty-plus" data-barcode="' + p.barcode + '" aria-label="Tăng">+</button></div></td>' +
+                        '<td class="col-subtotal">' + subtotal.toLocaleString('vi-VN') + 'đ</td>' +
+                        '<td class="col-remove"><button type="button" class="btn-remove btn-remove-item">Remove</button></td></tr>';
+                });
+                tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;color:#6b7280;">Chưa có sản phẩm. Quét mã hoặc search để thêm.</td></tr>';
+
+                var grand = total;
+                if (discountPercent > 0) grand = total * (1 - discountPercent / 100);
+                document.getElementById('grandTotal').value = grand.toLocaleString('vi-VN') + 'đ';
+
+                tbody.querySelectorAll('.btn-remove-item').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        var row = this.closest('tr');
+                        var barcode = row.getAttribute('data-barcode');
+                        removeFromCart(barcode);
+                    });
+                });
+                tbody.querySelectorAll('.btn-qty-minus').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        updateQty(this.getAttribute('data-barcode'), -1);
+                    });
+                });
+                tbody.querySelectorAll('.btn-qty-plus').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        updateQty(this.getAttribute('data-barcode'), 1);
+                    });
+                });
+            }
+
+            function addByBarcode(barcode) {
+                barcode = (barcode || '').trim();
+                if (!barcode) return;
+                var product = productsByBarcode[barcode];
+                if (product) {
+                    addToCart({ barcode: barcode, name: product.name, stock: product.stock, price: product.price }, 1);
+                }
+            }
+
+            document.getElementById('btnScanBarcode').addEventListener('click', function () {
+                document.getElementById('barcodeInput').focus();
+            });
+
+            document.getElementById('barcodeInput').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addByBarcode(this.value);
+                    this.value = '';
+                }
+            });
+
+            document.getElementById('searchProduct').addEventListener('input', function () {
+                var q = this.value.trim().toLowerCase();
+                var results = document.getElementById('searchResults');
+                if (q.length < 1) {
+                    results.classList.remove('show');
+                    results.innerHTML = '';
+                    return;
+                }
+                var matches = productsList.filter(function (p) {
+                    return p.name.toLowerCase().indexOf(q) >= 0 || (p.barcode + '').indexOf(q) >= 0;
+                });
+                results.innerHTML = matches.slice(0, 8).map(function (p) {
+                    return '<div class="item" data-barcode="' + p.barcode + '">' + p.name + ' - ' + p.price.toLocaleString('vi-VN') + 'đ</div>';
+                }).join('');
+                results.classList.add('show');
+                results.querySelectorAll('.item').forEach(function (el) {
+                    el.addEventListener('click', function () {
+                        var barcode = this.getAttribute('data-barcode');
+                        addToCart(productsList.find(function (p) { return p.barcode === barcode; }), 1);
+                        document.getElementById('searchProduct').value = '';
+                        results.classList.remove('show');
+                        results.innerHTML = '';
+                    });
+                });
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.search-wrap')) {
+                    document.getElementById('searchResults').classList.remove('show');
+                }
+            });
+
+            document.getElementById('linkSearchPage').addEventListener('click', function (e) {
+                e.preventDefault();
+                var q = document.getElementById('searchProduct').value.trim();
+                window.location.href = 'SearchProduct.html' + (q ? '?q=' + encodeURIComponent(q) : '');
+            });
+
+            document.getElementById('btnAddToCart').addEventListener('click', function () {
+                var barcode = document.getElementById('barcodeInput').value.trim();
+                if (barcode) {
+                    addByBarcode(barcode);
+                    document.getElementById('barcodeInput').value = '';
+                } else {
+                    document.getElementById('barcodeInput').focus();
+                }
+            });
+
+            document.getElementById('btnApplyDiscount').addEventListener('click', function () {
+                var input = document.getElementById('discountPercent');
+                discountPercent = parseFloat(input.value) || 0;
+                if (discountPercent < 0) discountPercent = 0;
+                if (discountPercent > 100) discountPercent = 100;
+                input.value = discountPercent;
+                renderCart();
+            });
+
+            document.getElementById('btnGenerateInvoice').addEventListener('click', function () {
+                if (cart.length === 0) {
+                    alert('Chưa có sản phẩm trong giỏ.');
+                    return;
+                }
+                var total = cart.reduce(function (sum, p) { return sum + p.price * p.qty; }, 0);
+                var discountVal = parseFloat(document.getElementById('discountPercent').value) || 0;
+                var discountAmt = total * (discountVal / 100);
+                var payable = total - discountAmt;
+                var paidInput = document.getElementById('amountTender').value.replace(/,/g, '').replace(/đ/g, '').trim();
+                var paid = parseFloat(paidInput) || payable;
+                if (paid > payable) paid = payable;
+                var balance = payable - paid;
+                var now = new Date();
+                var dateStr = now.getDate() + '/' + (now.getMonth() + 1) + '/' + now.getFullYear();
+                var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+                var invNo = 'INV-' + String(1000000 + Math.floor(Math.random() * 9999999)).slice(1);
+                var customerName = document.getElementById('customerName').value.trim() || 'Guest';
+                var invoiceData = {
+                    salesPoint: 'Store One',
+                    cashier: 'John Smith',
+                    invoiceNo: invNo,
+                    customer: customerName,
+                    date: dateStr,
+                    time: timeStr,
+                    items: cart.map(function (p) {
+                        return { name: p.name, qty: p.qty, unitPrice: p.price, amount: p.price * p.qty };
+                    }),
+                    total: total,
+                    discountPercent: discountVal,
+                    discountAmount: discountAmt,
+                    payable: payable,
+                    paid: paid,
+                    balance: balance,
+                    paidVia: document.getElementById('paymentMethod').value || '—'
+                };
+                try {
+                    sessionStorage.setItem('pos_invoice_data', JSON.stringify(invoiceData));
+                    window.location.href = 'invoice.html';
+                } catch (e) {
+                    alert('Không thể tạo hóa đơn.');
+                }
+            });
+
+            renderCart();
+        })();
+    </script>
+</body>
+</html>

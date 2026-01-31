@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders List - POS System</title>
+    <title>Search Product - POS System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -109,8 +109,8 @@
         .user-info { display: flex; align-items: center; gap: 0.75rem; }
         .user-avatar {
             width: 40px; height: 40px;
-            background: #1e293b;
-            border-radius: 10px;
+            background: #d97706;
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: white; font-weight: 600; font-size: 0.9rem;
         }
@@ -119,13 +119,52 @@
         .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
 
         .content { padding: 2rem; flex: 1; overflow-y: auto; }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
         .content-title {
             font-size: 1.5rem;
             font-weight: 700;
             color: #1a1d21;
             letter-spacing: -0.02em;
-            margin-bottom: 1.75rem;
         }
+        .search-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .search-row label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .search-row input {
+            padding: 0.6rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 260px;
+        }
+        .search-row input:focus {
+            outline: none;
+            border-color: #0d9488;
+            box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+        }
+        .btn-back {
+            padding: 0.5rem 1rem;
+            background: #374151;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .btn-back:hover { background: #1f2937; }
 
         .table-container {
             background: #fff;
@@ -137,54 +176,42 @@
         .table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: auto;
+            table-layout: fixed;
         }
         .table th,
         .table td {
             padding: 0.875rem 1rem;
             vertical-align: middle;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
         }
         .table th {
             background: #f7f8fa;
             font-weight: 600;
             color: #4a5568;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
-        .table td {
-            color: #374151;
-        }
+        .table td { color: #374151; }
         .table tbody tr:hover { background: #f7f8fa; }
+        .table th:nth-child(1), .table td:nth-child(1) { width: 4rem; text-align: center; }
+        .table th:nth-child(2), .table td:nth-child(2) { width: 10rem; text-align: left; }
+        .table th:nth-child(3), .table td:nth-child(3) { width: auto; text-align: left; }
+        .table th:nth-child(4), .table td:nth-child(4) { width: 10rem; text-align: left; }
+        .table th:nth-child(5), .table td:nth-child(5) { width: 9rem; text-align: left; }
+        .table th:nth-child(6), .table td:nth-child(6) { width: 8rem; text-align: right; }
+        .table th:nth-child(7), .table td:nth-child(7) { width: 8rem; text-align: right; }
 
-        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; min-width: 6rem; }
-        .table th:nth-child(2), .table td:nth-child(2) { text-align: left; min-width: 10rem; }
-        .table th:nth-child(3), .table td:nth-child(3) { text-align: left; min-width: 10rem; }
-        .table th:nth-child(4), .table td:nth-child(4) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; min-width: 4rem; }
-        .table th:nth-child(6), .table td:nth-child(6) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(7), .table td:nth-child(7) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(8), .table td:nth-child(8) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(9), .table td:nth-child(9) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(10), .table td:nth-child(10) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(11), .table td:nth-child(11) { text-align: center; min-width: 5rem; }
-
-        .status-badge {
-            padding: 0.25rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            display: inline-block;
+        .no-results {
+            padding: 2rem;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.95rem;
         }
-        .status-paid { background: #d1fae5; color: #065f46; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-cancelled { background: #fee2e2; color: #991b1b; }
 
         @media (max-width: 768px) {
             .sidebar { width: 240px; }
             .main-content { margin-left: 0; }
-            .header { padding: 1rem; }
             .content { padding: 1rem; }
             .table-container { overflow-x: auto; }
         }
@@ -205,8 +232,8 @@
                 <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
                 <li><a href="../category/ListCategory.html">Category</a></li>
                 <li><a href="../product/ListProduct.html">Products</a></li>
-                <li><a href="../barcodeScanner/BarcodeScanner.html">Barcode Scanner</a></li>
-                <li><a href="ViewAllOrder.html" class="active">Orders</a></li>
+                <li><a href="BarcodeScanner.html" class="active">Barcode Scanner</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
                 <li><a href="../creditors/Creditors.html">Creditors</a></li>
                 <li><a href="../expired/Expired.html">Expired</a></li>
                 <li><a href="../report/report.html">Reports</a></li>
@@ -220,94 +247,108 @@
     <div class="main-content">
         <div class="header">
             <div class="header-right">
-                <div class="time-badge">11:17:23 AM</div>
+                <div class="time-badge">11:20:00 AM</div>
                 <div class="user-info">
                     <div class="user-details">
-                        <div class="name">kodemade</div>
-                        <div class="role">Administrator</div>
+                        <div class="name">John Smith</div>
+                        <div class="role">Cashier</div>
                     </div>
-                    <div class="user-avatar">K</div>
+                    <div class="user-avatar">D</div>
                 </div>
             </div>
         </div>
 
         <div class="content">
-            <h1 class="content-title">Orders List</h1>
+            <div class="content-header">
+                <h1 class="content-title">Search Product</h1>
+                <div class="search-row">
+                    <label for="searchInput">Search sản phẩm:</label>
+                    <input type="text" id="searchInput" placeholder="Nhập tên sản phẩm..." autocomplete="off">
+                    <a href="BarcodeScanner.html" class="btn-back">← Back to POS</a>
+                </div>
+            </div>
 
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Phone</th>
-                            <th>Total</th>
-                            <th>Discount (%)</th>
-                            <th>Payable</th>
-                            <th>Paid</th>
-                            <th>Payment</th>
-                            <th>Status</th>
-                            <th>Cashier</th>
-                            <th>Action</th>
+                            <th>S/N</th>
+                            <th>Barcode</th>
+                            <th>Products</th>
+                            <th>Category</th>
+                            <th>Expire</th>
+                            <th>Price</th>
+                            <th>In Stock</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>ORD-001</td>
-                            <td>Nguyen Van A</td>
-                            <td>0901234567</td>
-                            <td>đ125,000</td>
-                            <td>5</td>
-                            <td>đ118,750</td>
-                            <td>đ118,750</td>
-                            <td>Card</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
-                            <td>John</td>
-                            <td><a href="ViewOrderDetail.html?id=1">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>ORD-002</td>
-                            <td>Tran Thi B</td>
-                            <td>0987463212</td>
-                            <td>đ85,400</td>
-                            <td>0</td>
-                            <td>đ85,400</td>
-                            <td>đ85,400</td>
-                            <td>Cash</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
-                            <td>Jane</td>
-                            <td><a href="ViewOrderDetail.html?id=2">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>ORD-003</td>
-                            <td>Le Van C</td>
-                            <td>0912345678</td>
-                            <td>đ250,000</td>
-                            <td>10</td>
-                            <td>đ189,000</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td><span class="status-badge status-pending">Pending</span></td>
-                            <td>John</td>
-                            <td><a href="ViewOrderDetail.html?id=3">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>ORD-004</td>
-                            <td>Pham Thi D</td>
-                            <td>0923456789</td>
-                            <td>đ45,200</td>
-                            <td>3</td>
-                            <td>đ43,844</td>
-                            <td>đ43,844</td>
-                            <td>Transfer</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
-                            <td>Jane</td>
-                            <td><a href="ViewOrderDetail.html?id=4">View</a></td>
-                        </tr>
-                    </tbody>
+                    <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <script>
+        (function () {
+            var products = [
+                { sn: 1, barcode: '8901234567890', name: 'Anni Item1', category: 'Food', expire: '01/06/2025', price: 85000, stock: 50 },
+                { sn: 2, barcode: '8901234567891', name: 'BD item1', category: 'Stationery', expire: '15/07/2025', price: 120000, stock: 30 },
+                { sn: 3, barcode: '8901234567892', name: 'Wed Item1', category: 'Food', expire: '20/08/2025', price: 95000, stock: 45 },
+                { sn: 4, barcode: '8901234567893', name: 'Product D', category: 'Electronics', expire: '10/09/2025', price: 150000, stock: 20 },
+                { sn: 5, barcode: '8901234567894', name: 'Product E', category: 'Beverage', expire: '05/10/2025', price: 45000, stock: 60 },
+                { sn: 6, barcode: 'B100001', name: 'Biro', category: 'Stationery', expire: '02/04/2025', price: 750, stock: 200 },
+                { sn: 7, barcode: 'ACD00909', name: 'Exercise Book', category: 'Stationery', expire: '03/04/2025', price: 1350, stock: 300 },
+                { sn: 8, barcode: 'AGT90012', name: 'Big Note', category: 'Stationery', expire: '04/04/2025', price: 400, stock: 0 },
+                { sn: 9, barcode: 'CHA10001', name: 'Colored Chalk', category: 'Stationery', expire: '05/04/2025', price: 450, stock: 200 },
+                { sn: 10, barcode: 'IND001', name: 'Indomie', category: 'Food', expire: '12/05/2025', price: 300, stock: 500 },
+                { sn: 11, barcode: 'MILK002', name: 'Milk 1L', category: 'Beverage', expire: '01/06/2025', price: 25000, stock: 80 },
+                { sn: 12, barcode: 'RICE003', name: 'Rice 5kg', category: 'Food', expire: '30/12/2025', price: 95000, stock: 120 }
+            ];
+
+            var tbody = document.getElementById('tableBody');
+            var searchInput = document.getElementById('searchInput');
+
+            function fmtPrice(n) {
+                return (n || 0).toLocaleString('vi-VN') + 'đ';
+            }
+
+            function render(filter) {
+                var q = (filter || '').trim().toLowerCase();
+                var list = products.filter(function (p) {
+                    if (!q) return true;
+                    return (p.name || '').toLowerCase().indexOf(q) >= 0 ||
+                           (p.barcode || '').toLowerCase().indexOf(q) >= 0 ||
+                           (p.category || '').toLowerCase().indexOf(q) >= 0;
+                });
+                var html = '';
+                list.forEach(function (p, i) {
+                    html += '<tr>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td>' + p.barcode + '</td>' +
+                        '<td>' + p.name + '</td>' +
+                        '<td>' + p.category + '</td>' +
+                        '<td>' + p.expire + '</td>' +
+                        '<td>' + fmtPrice(p.price) + '</td>' +
+                        '<td>' + p.stock + '</td></tr>';
+                });
+                if (!html) {
+                    html = '<tr><td colspan="7" class="no-results">Không tìm thấy sản phẩm nào phù hợp.</td></tr>';
+                }
+                tbody.innerHTML = html;
+            }
+
+            searchInput.addEventListener('input', function () {
+                render(this.value);
+            });
+
+            searchInput.addEventListener('keyup', function (e) {
+                if (e.key === 'Enter') render(this.value);
+            });
+
+            var params = new URLSearchParams(window.location.search);
+            var q = params.get('q') || '';
+            searchInput.value = q;
+            render(q);
+        })();
+    </script>
 </body>
 </html>
