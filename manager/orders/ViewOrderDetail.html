@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Discount - POS System</title>
+    <title>Order Detail - POS System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -99,7 +99,7 @@
         }
         .header-right { display: flex; align-items: center; gap: 1.25rem; }
         .time-badge {
-            background: #667eea;
+            background: #0d9488;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 8px;
@@ -109,7 +109,7 @@
         .user-info { display: flex; align-items: center; gap: 0.75rem; }
         .user-avatar {
             width: 40px; height: 40px;
-            background: #667eea;
+            background: #1e293b;
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             color: white; font-weight: 600; font-size: 0.9rem;
@@ -123,80 +123,85 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            color: #667eea;
+            color: #0d9488;
             text-decoration: none;
             font-weight: 600;
             font-size: 0.9rem;
             margin-bottom: 1.5rem;
         }
         .back-link:hover { text-decoration: underline; }
-        .page-title {
+        .content-title {
             font-size: 1.5rem;
             font-weight: 700;
             color: #1a1d21;
-            letter-spacing: -0.02em;
             margin-bottom: 1.5rem;
         }
-        .form-card {
+
+        .bill-card {
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
             border: 1px solid #e8eaed;
-            max-width: 480px;
-            padding: 1.5rem;
+            padding: 2rem;
+            max-width: 560px;
         }
-        .form-group { margin-bottom: 1.25rem; }
-        .form-group label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
+        .bill-info {
+            margin-bottom: 1.5rem;
+        }
+        .bill-info-row {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
             color: #374151;
-            margin-bottom: 0.4rem;
         }
-        .form-group input {
-            width: 100%;
-            padding: 0.7rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 0.95rem;
+        .bill-info-row strong {
             color: #1a1d21;
-            font-family: inherit;
+            min-width: 220px;
+            display: inline-block;
         }
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.25rem;
         }
-        .form-actions {
+        .bill-table th,
+        .bill-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e8eaed;
+            font-size: 0.9rem;
+        }
+        .bill-table th {
+            background: #f7f8fa;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .bill-table td:nth-child(2) { text-align: right; }
+        .bill-table td:nth-child(3) { text-align: right; font-weight: 500; }
+        .bill-table .unit-price-cell {
+            color: #374151;
+        }
+        .bill-summary {
+            border-top: 2px solid #e8eaed;
+            padding-top: 1rem;
+        }
+        .bill-summary-row {
             display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+            color: #374151;
         }
-        .btn-cancel {
-            padding: 0.65rem 1.25rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            background: #dc2626;
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
+        .bill-summary-row.total-payment {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1a1d21;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e8eaed;
         }
-        .btn-cancel:hover { background: #b91c1c; }
-        .btn-submit {
-            padding: 0.65rem 1.25rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            background: #16a34a;
-            color: white;
-        }
-        .btn-submit:hover { background: #15803d; }
 
         @media (max-width: 768px) {
             .sidebar { width: 240px; }
@@ -215,14 +220,10 @@
         <div class="sidebar-content">
             <ul class="sidebar-menu">
                 <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
-                <li><a href="../user/users.html">Users</a></li>
-                <li><a href="../customer/ListCustomer.html">Customer</a></li>
-                <li><a href="Discount.html" class="active">Discount</a></li>
                 <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
                 <li><a href="../category/ListCategory.html">Category</a></li>
                 <li><a href="../product/ListProduct.html">Products</a></li>
-                <li><a href="../barcodeScanner/BarcodeScanner.html">Barcode Scanner</a></li>
-                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="ViewAllOrder.html" class="active">Orders</a></li>
                 <li><a href="../creditors/Creditors.html">Creditors</a></li>
                 <li><a href="../expired/Expired.html">Expired</a></li>
                 <li><a href="../report/report.html">Reports</a></li>
@@ -236,7 +237,7 @@
     <div class="main-content">
         <div class="header">
             <div class="header-right">
-                <div class="time-badge">11:20:00 AM</div>
+                <div class="time-badge">11:17:23 AM</div>
                 <div class="user-info">
                     <div class="user-details">
                         <div class="name">kodemade</div>
@@ -248,65 +249,132 @@
         </div>
 
         <div class="content">
-            <a href="Discount.html" class="back-link">← Back to Discount List</a>
-            <h1 class="page-title">Edit Discount</h1>
+            <a href="ViewAllOrder.html" class="back-link">← Back to Orders List</a>
+            <h1 class="content-title">Order Detail</h1>
 
-            <div class="form-card">
-                <form id="editDiscountForm">
-                    <input type="hidden" id="id" name="id">
-                    <div class="form-group">
-                        <label for="name">Discount Name</label>
-                        <input type="text" id="name" name="name" placeholder="e.g. Holiday Special">
+            <div class="bill-card">
+                <div class="bill-info">
+                    <div class="bill-info-row">
+                        <strong>Số điện thoại khách hàng (nếu có):</strong>
+                        <span id="customerPhone">—</span>
                     </div>
-                    <div class="form-group">
-                        <label for="percent">Discount %</label>
-                        <input type="text" id="percent" name="percent" placeholder="e.g. 5">
+                    <div class="bill-info-row">
+                        <strong>Nhân viên bán hàng:</strong>
+                        <span id="cashier">—</span>
                     </div>
-                    <div class="form-group">
-                        <label for="minOrder">Min Order Amount (đ)</label>
-                        <input type="text" id="minOrder" name="minOrder" placeholder="e.g. 500000">
+                </div>
+
+                <table class="bill-table">
+                    <thead>
+                        <tr>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderItems">
+                    </tbody>
+                </table>
+
+                <div class="bill-summary">
+                    <div class="bill-summary-row">
+                        <span>Tổng tiền hàng</span>
+                        <span id="subtotal">—</span>
                     </div>
-                    <div class="form-group">
-                        <label for="startDate">Start Date</label>
-                        <input type="text" id="startDate" name="startDate" placeholder="DD/MM/YYYY">
+                    <div class="bill-summary-row">
+                        <span>Giảm giá</span>
+                        <span id="discount">—</span>
                     </div>
-                    <div class="form-group">
-                        <label for="endDate">End Date</label>
-                        <input type="text" id="endDate" name="endDate" placeholder="DD/MM/YYYY">
+                    <div class="bill-summary-row total-payment">
+                        <span>Tổng thanh toán</span>
+                        <span id="totalPayment">—</span>
                     </div>
-                    <div class="form-actions">
-                        <a href="Discount.html" class="btn-cancel">Cancel</a>
-                        <button type="submit" class="btn-submit">Update</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         (function () {
-            var discountsData = {
-                1: { name: 'Holiday Special', percent: '5', minOrder: '500000', startDate: '01/01/2025', endDate: '01/01/2025' },
-                2: { name: 'Year-End Sale', percent: '10', minOrder: '1000000', startDate: '25/12/2025', endDate: '31/12/2025' },
-                3: { name: 'Loyal Customer', percent: '3', minOrder: '200000', startDate: '01/01/2025', endDate: '31/12/2025' },
-                4: { name: 'Flash Sale 8/3', percent: '15', minOrder: '300000', startDate: '08/03/2025', endDate: '08/03/2025' }
+            var orders = {
+                1: {
+                    customerPhone: '0901234567',
+                    cashier: 'John',
+                    items: [
+                        { name: 'Dưa hấu', unitPrice: 10000, qty: 2, amount: 20000 },
+                        { name: 'Bánh mì', unitPrice: 15000, qty: 3, amount: 45000 },
+                        { name: 'Sữa tươi', unitPrice: 20000, qty: 3, amount: 60000 }
+                    ],
+                    subtotal: 125000,
+                    discountPercent: 5,
+                    discountAmount: 6250,
+                    totalPayment: 118750
+                },
+                2: {
+                    customerPhone: '0987463212',
+                    cashier: 'Jane',
+                    items: [
+                        { name: 'Cà phê đen', unitPrice: 25000, qty: 2, amount: 50000 },
+                        { name: 'Bánh ngọt', unitPrice: 17700, qty: 2, amount: 35400 }
+                    ],
+                    subtotal: 85400,
+                    discountPercent: 0,
+                    discountAmount: 0,
+                    totalPayment: 85400
+                },
+                3: {
+                    customerPhone: null,
+                    cashier: 'John',
+                    items: [
+                        { name: 'Áo thun', unitPrice: 150000, qty: 1, amount: 150000 },
+                        { name: 'Nước ngọt', unitPrice: 10000, qty: 4, amount: 40000 }
+                    ],
+                    subtotal: 250000,
+                    discountPercent: 10,
+                    discountAmount: 25000,
+                    totalPayment: 225000
+                },
+                4: {
+                    customerPhone: '0923456789',
+                    cashier: 'Jane',
+                    items: [
+                        { name: 'Tập vở', unitPrice: 8500, qty: 2, amount: 17000 },
+                        { name: 'Bút bi', unitPrice: 4700, qty: 6, amount: 28200 }
+                    ],
+                    subtotal: 45200,
+                    discountPercent: 3,
+                    discountAmount: 1356,
+                    totalPayment: 43844
+                }
             };
+
+            function formatMoney(n) {
+                return new Intl.NumberFormat('vi-VN').format(n) + 'đ';
+            }
 
             var params = new URLSearchParams(window.location.search);
             var id = params.get('id') || '1';
-            var d = discountsData[id] || discountsData[1];
+            var order = orders[id] || orders[1];
 
-            document.getElementById('id').value = id;
-            document.getElementById('name').value = d.name || '';
-            document.getElementById('percent').value = d.percent || '';
-            document.getElementById('minOrder').value = d.minOrder || '';
-            document.getElementById('startDate').value = d.startDate || '';
-            document.getElementById('endDate').value = d.endDate || '';
+            document.getElementById('customerPhone').textContent = order.customerPhone || '—';
+            document.getElementById('cashier').textContent = order.cashier || '—';
 
-            document.getElementById('editDiscountForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                window.location.href = 'Discount.html';
+            var tbody = document.getElementById('orderItems');
+            tbody.innerHTML = '';
+            order.items.forEach(function (item) {
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td class="unit-price-cell">(' + item.name + ' - ' + formatMoney(item.unitPrice) + ')</td>' +
+                    '<td>' + item.qty + '</td>' +
+                    '<td>' + formatMoney(item.amount) + '</td>';
+                tbody.appendChild(tr);
             });
+
+            document.getElementById('subtotal').textContent = formatMoney(order.subtotal);
+            document.getElementById('discount').textContent = order.discountPercent
+                ? order.discountPercent + '% (' + formatMoney(order.discountAmount) + ')'
+                : '0đ';
+            document.getElementById('totalPayment').textContent = formatMoney(order.totalPayment);
         })();
     </script>
 </body>

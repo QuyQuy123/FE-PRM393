@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suppliers Information - POS System</title>
+    <title>Product Category List - POS System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f0f2f5;
@@ -14,7 +13,6 @@
             height: 100vh;
             color: #1a1d21;
         }
-
         .sidebar {
             width: 260px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -27,7 +25,6 @@
             flex-direction: column;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
         }
-
         .sidebar-header {
             padding: 1.5rem 1.5rem 1.25rem;
             background: rgba(0, 0, 0, 0.1);
@@ -36,20 +33,13 @@
             gap: 0.65rem;
             flex-shrink: 0;
         }
-
         .sidebar-header .logo {
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             background: white;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #667eea;
-            font-weight: 700;
-            font-size: 0.95rem;
+            display: flex; align-items: center; justify-content: center;
+            color: #667eea; font-weight: 700; font-size: 0.95rem;
         }
-
         .sidebar-title { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.02em; }
         .sidebar-content { flex: 1; display: flex; flex-direction: column; }
         .sidebar-menu { list-style: none; padding: 0.75rem 0; flex: 1; }
@@ -87,18 +77,13 @@
             transition: all 0.25s ease;
             font-size: 0.95rem;
             border-left: 3px solid transparent;
-            width: 100%;
-            background: none;
-            border: none;
-            cursor: pointer;
-            text-align: left;
+            width: 100%; background: none; border: none; cursor: pointer; text-align: left;
         }
         .logout-btn:hover {
             background: rgba(255, 255, 255, 0.1);
             color: white;
             border-left: 3px solid white;
         }
-
         .main-content {
             margin-left: 260px;
             flex: 1;
@@ -106,7 +91,6 @@
             flex-direction: column;
             min-width: 0;
         }
-
         .header {
             background: #fff;
             padding: 1rem 2rem;
@@ -118,7 +102,7 @@
         }
         .header-right { display: flex; align-items: center; gap: 1.25rem; }
         .time-badge {
-            background: #16a34a;
+            background: #14b8a6;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 8px;
@@ -127,21 +111,15 @@
         }
         .user-info { display: flex; align-items: center; gap: 0.75rem; }
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: #16a34a;
+            width: 40px; height: 40px;
+            background: #14b8a6;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.9rem;
         }
         .user-details { font-size: 0.9rem; }
         .user-details .name { font-weight: 600; color: #1a1d21; }
         .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
-
         .content { padding: 2rem; flex: 1; overflow-y: auto; }
         .content-header {
             display: flex;
@@ -155,9 +133,8 @@
             color: #1a1d21;
             letter-spacing: -0.02em;
         }
-
-        .add-supplier-btn {
-            background: #16a34a;
+        .add-category-btn {
+            background: #14b8a6;
             color: white;
             padding: 0.7rem 1.35rem;
             border: none;
@@ -171,12 +148,11 @@
             align-items: center;
             gap: 0.5rem;
         }
-        .add-supplier-btn:hover {
-            background: #15803d;
+        .add-category-btn:hover {
+            background: #0d9488;
             transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
+            box-shadow: 0 4px 14px rgba(20, 184, 166, 0.4);
         }
-
         .table-container {
             background: #fff;
             border-radius: 12px;
@@ -204,7 +180,6 @@
         }
         .table tbody tr:last-child td { border-bottom: none; }
         .table tbody tr:hover { background: #f7f8fa; }
-
         .status-badge {
             padding: 0.3rem 0.85rem;
             border-radius: 20px;
@@ -216,7 +191,6 @@
         }
         .status-active { background: #d1fae5; color: #065f46; }
         .status-deactive { background: #fee2e2; color: #991b1b; }
-
         .action-buttons { display: flex; gap: 0.5rem; }
         .btn {
             padding: 0.45rem 0.9rem;
@@ -239,12 +213,8 @@
             transform: translateY(-1px);
             box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
         }
-        .btn-delete {
-            background: #dc2626;
-            color: white;
-        }
+        .btn-delete { background: #dc2626; color: white; }
         .btn-delete:hover { background: #b91c1c; }
-
         .btn-active {
             background: #14b8a6;
             color: white;
@@ -253,9 +223,8 @@
             background: #0d9488;
             box-shadow: 0 2px 8px rgba(20, 184, 166, 0.35);
         }
-
-        /* Modal overlay - nền chìm */
-        .supplier-modal-overlay {
+        /* Modal - nền chìm, form nổi */
+        .category-modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
@@ -265,17 +234,16 @@
             padding: 2rem;
             z-index: 1000;
         }
-        .supplier-modal-overlay.is-open { display: flex; }
-        .supplier-modal-card {
+        .category-modal-overlay.is-open { display: flex; }
+        .category-modal-card {
             background: #fff;
             border-radius: 14px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 460px;
-            max-height: 90vh;
-            overflow-y: auto;
+            overflow: hidden;
         }
-        .supplier-modal-header {
+        .category-modal-header {
             padding: 1.35rem 1.5rem;
             border-bottom: 1px solid #e8eaed;
             display: flex;
@@ -283,24 +251,24 @@
             justify-content: space-between;
             background: #fafbfc;
         }
-        .supplier-modal-title { font-size: 1.25rem; font-weight: 700; color: #1a1d21; }
-        .supplier-modal-close {
+        .category-modal-title { font-size: 1.25rem; font-weight: 700; color: #1a1d21; }
+        .category-modal-close {
             width: 36px; height: 36px;
             border: none; background: transparent; border-radius: 8px;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             font-size: 1.25rem; color: #6b7280; transition: all 0.2s ease;
         }
-        .supplier-modal-close:hover { background: #e8eaed; color: #1a1d21; }
-        .supplier-modal-body { padding: 1.5rem 1.5rem 1.75rem; }
-        .supplier-form-group { margin-bottom: 1.15rem; }
-        .supplier-form-label {
+        .category-modal-close:hover { background: #e8eaed; color: #1a1d21; }
+        .category-modal-body { padding: 1.5rem 1.5rem 1.75rem; }
+        .category-form-group { margin-bottom: 1.15rem; }
+        .category-form-label {
             display: block;
             font-size: 0.875rem;
             font-weight: 600;
             color: #374151;
             margin-bottom: 0.4rem;
         }
-        .supplier-form-input {
+        .category-form-input {
             width: 100%;
             padding: 0.7rem 1rem;
             font-size: 0.95rem;
@@ -310,13 +278,12 @@
             color: #1a1d21;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .supplier-form-input:focus {
+        .category-form-input:focus {
             outline: none;
-            border-color: #16a34a;
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
         }
-        textarea.supplier-form-input { min-height: 80px; resize: vertical; }
-        .supplier-modal-footer {
+        .category-modal-footer {
             padding: 1.25rem 1.5rem 1.5rem;
             border-top: 1px solid #e8eaed;
             display: flex;
@@ -336,8 +303,8 @@
             transition: all 0.2s ease;
         }
         .btn-modal-close:hover { background: #b91c1c; }
-        .btn-modal-submit {
-            background: #14b8a6;
+        .btn-modal-create {
+            background: #16a34a;
             color: white;
             padding: 0.65rem 1.35rem;
             border-radius: 10px;
@@ -347,9 +314,9 @@
             border: none;
             transition: all 0.2s ease;
         }
-        .btn-modal-submit:hover {
-            background: #0d9488;
-            box-shadow: 0 2px 10px rgba(20, 184, 166, 0.35);
+        .btn-modal-create:hover {
+            background: #15803d;
+            box-shadow: 0 2px 10px rgba(22, 163, 74, 0.35);
         }
         .btn-modal-update {
             background: #16a34a;
@@ -366,7 +333,6 @@
             background: #15803d;
             box-shadow: 0 2px 10px rgba(22, 163, 74, 0.35);
         }
-
         @media (max-width: 768px) {
             .sidebar { width: 240px; }
             .main-content { margin-left: 0; }
@@ -385,13 +351,9 @@
         <div class="sidebar-content">
             <ul class="sidebar-menu">
                 <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
-                <li><a href="../user/users.html">Users</a></li>
-                <li><a href="../customer/ListCustomer.html">Customer</a></li>
-                <li><a href="../discount/Discount.html">Discount</a></li>
-                <li><a href="ListSupplier.html" class="active">Suppliers</a></li>
-                <li><a href="../category/ListCategory.html">Category</a></li>
+                <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
+                <li><a href="ListCategory.html" class="active">Category</a></li>
                 <li><a href="../product/ListProduct.html">Products</a></li>
-                <li><a href="../barcodeScanner/BarcodeScanner.html">Barcode Scanner</a></li>
                 <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
                 <li><a href="../creditors/Creditors.html">Creditors</a></li>
                 <li><a href="../expired/Expired.html">Expired</a></li>
@@ -406,7 +368,7 @@
     <div class="main-content">
         <div class="header">
             <div class="header-right">
-                <div class="time-badge">11:15:15 AM</div>
+                <div class="time-badge">11:16:11 AM</div>
                 <div class="user-info">
                     <div class="user-details">
                         <div class="name">kodemade</div>
@@ -419,8 +381,8 @@
 
         <div class="content">
             <div class="content-header">
-                <h1 class="content-title">Suppliers Information</h1>
-                <a href="#" class="add-supplier-btn" id="openAddSupplierModal">+ Add Suppliers</a>
+                <h1 class="content-title">Product Category List</h1>
+                <a href="#" class="add-category-btn" id="openAddCategoryModal">+ Add Category</a>
             </div>
 
             <div class="table-container">
@@ -428,12 +390,8 @@
                     <thead>
                         <tr>
                             <th>S/N</th>
-                            <th>NAME</th>
-                            <th>COMPANY</th>
-                            <th>REGDATE</th>
-                            <th>E-MAIL</th>
-                            <th>PHONE</th>
-                            <th>ADDRESS</th>
+                            <th>CATEGORY NAME</th>
+                            <th>CREATED AT</th>
                             <th>STATUS</th>
                             <th>ACTION</th>
                         </tr>
@@ -441,64 +399,48 @@
                     <tbody>
                         <tr>
                             <td>1</td>
-                            <td>Supplier One</td>
-                            <td>Supplier One Ltd</td>
-                            <td>Wed Jul 12th 2023</td>
-                            <td>supplier@pos.com</td>
-                            <td>3030202</td>
-                            <td>Supplier address</td>
+                            <td>Clothing</td>
+                            <td>July 12th, 2023</td>
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="#" class="btn btn-edit open-update-supplier" data-supplier-id="1">Edit</a>
+                                    <a href="#" class="btn btn-edit open-update-category" data-category-id="1">Edit</a>
                                     <a href="#" class="btn btn-delete">Delete</a>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>2</td>
-                            <td>Supplier Two</td>
-                            <td>ABC Trading Co.</td>
-                            <td>Mon Aug 21st 2023</td>
-                            <td>abc.trading@email.com</td>
-                            <td>0912345678</td>
-                            <td>123 Nguyen Hue, Q1, HCM</td>
+                            <td>Drinks</td>
+                            <td>July 12th, 2023</td>
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="#" class="btn btn-edit open-update-supplier" data-supplier-id="2">Edit</a>
+                                    <a href="#" class="btn btn-edit open-update-category" data-category-id="2">Edit</a>
                                     <a href="#" class="btn btn-delete">Delete</a>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>3</td>
-                            <td>Supplier Three</td>
-                            <td>Global Supplies JSC</td>
-                            <td>Fri Oct 6th 2023</td>
-                            <td>global@supplies.vn</td>
-                            <td>0987654321</td>
-                            <td>45 Le Loi, District 3, HCM</td>
+                            <td>Food</td>
+                            <td>July 12th, 2023</td>
                             <td><span class="status-badge status-deactive">Deactive</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="#" class="btn btn-edit open-update-supplier" data-supplier-id="3">Edit</a>
+                                    <a href="#" class="btn btn-edit open-update-category" data-category-id="3">Edit</a>
                                     <a href="#" class="btn btn-active">Active</a>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td>4</td>
-                            <td>Supplier Four</td>
-                            <td>Fast Goods Distribution</td>
-                            <td>Tue Dec 19th 2023</td>
-                            <td>contact@fastgoods.com</td>
-                            <td>02838291234</td>
-                            <td>78 Tran Hung Dao, Q5, HCM</td>
+                            <td>Stationery</td>
+                            <td>July 12th, 2023</td>
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="#" class="btn btn-edit open-update-supplier" data-supplier-id="4">Edit</a>
+                                    <a href="#" class="btn btn-edit open-update-category" data-category-id="4">Edit</a>
                                     <a href="#" class="btn btn-delete">Delete</a>
                                 </div>
                             </td>
@@ -509,139 +451,99 @@
         </div>
     </div>
 
-    <!-- Add Supplier Modal - nổi lên trên, nền chìm -->
-    <div class="supplier-modal-overlay" id="addSupplierOverlay" role="dialog" aria-modal="true">
-        <div class="supplier-modal-card" onclick="event.stopPropagation()">
-            <div class="supplier-modal-header">
-                <h2 class="supplier-modal-title">Add Suppliers</h2>
-                <button type="button" class="supplier-modal-close" aria-label="Close" id="closeAddSupplierModal">&times;</button>
+    <!-- Add Category Modal - nổi lên trên, nền chìm -->
+    <div class="category-modal-overlay" id="addCategoryOverlay" role="dialog" aria-modal="true">
+        <div class="category-modal-card" onclick="event.stopPropagation()">
+            <div class="category-modal-header">
+                <h2 class="category-modal-title">Add Category</h2>
+                <button type="button" class="category-modal-close" aria-label="Close" id="closeAddCategoryModal">&times;</button>
             </div>
-            <form class="supplier-modal-body" id="addSupplierForm">
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="addSupplierName">Supplier Name</label>
-                    <input type="text" id="addSupplierName" class="supplier-form-input" placeholder="Supplier Name" required>
-                </div>
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="addCompanyName">Company Name</label>
-                    <input type="text" id="addCompanyName" class="supplier-form-input" placeholder="Company Name" required>
-                </div>
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="addSupplierEmail">Supplier e-Mail</label>
-                    <input type="email" id="addSupplierEmail" class="supplier-form-input" placeholder="Enter Company e-mail..." required>
-                </div>
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="addSupplierPhone">Supplier Phone</label>
-                    <input type="text" id="addSupplierPhone" class="supplier-form-input" placeholder="Enter Company phone..." required>
-                </div>
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="addSupplierAddress">Supplier Address</label>
-                    <textarea id="addSupplierAddress" class="supplier-form-input" placeholder="Enter Company address..." rows="3"></textarea>
+            <form class="category-modal-body" id="addCategoryForm">
+                <div class="category-form-group">
+                    <label class="category-form-label" for="addCategoryName">Category Name</label>
+                    <input type="text" id="addCategoryName" class="category-form-input" placeholder="Clothing" required>
                 </div>
             </form>
-            <div class="supplier-modal-footer">
-                <button type="button" class="btn-modal-close" id="closeAddSupplierBtn">Close</button>
-                <button type="submit" form="addSupplierForm" class="btn-modal-submit">Submit</button>
+            <div class="category-modal-footer">
+                <button type="button" class="btn-modal-close" id="closeAddCategoryBtn">Close</button>
+                <button type="submit" form="addCategoryForm" class="btn-modal-create">Create</button>
             </div>
         </div>
     </div>
 
-    <!-- Update Supplier Modal - nổi lên trên, nền chìm -->
-    <div class="supplier-modal-overlay" id="updateSupplierOverlay" role="dialog" aria-modal="true">
-        <div class="supplier-modal-card" onclick="event.stopPropagation()">
-            <div class="supplier-modal-header">
-                <h2 class="supplier-modal-title">Update Supplier</h2>
-                <button type="button" class="supplier-modal-close" aria-label="Close" id="closeUpdateSupplierModal">&times;</button>
+    <!-- Update Category Modal - nổi lên trên, nền chìm -->
+    <div class="category-modal-overlay" id="updateCategoryOverlay" role="dialog" aria-modal="true">
+        <div class="category-modal-card" onclick="event.stopPropagation()">
+            <div class="category-modal-header">
+                <h2 class="category-modal-title">Update Category</h2>
+                <button type="button" class="category-modal-close" aria-label="Close" id="closeUpdateCategoryModal">&times;</button>
             </div>
-            <form class="supplier-modal-body" id="updateSupplierForm">
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="updateSupplierName">Supplier Name</label>
-                    <input type="text" id="updateSupplierName" class="supplier-form-input" placeholder="Supplier Name" required>
-                </div>
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="updateCompany">Company</label>
-                    <input type="text" id="updateCompany" class="supplier-form-input" placeholder="Company" required>
-                </div>
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="updateEmail">Email</label>
-                    <input type="email" id="updateEmail" class="supplier-form-input" placeholder="Email" required>
-                </div>
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="updatePhone">Phone</label>
-                    <input type="text" id="updatePhone" class="supplier-form-input" placeholder="Phone" required>
-                </div>
-                <div class="supplier-form-group">
-                    <label class="supplier-form-label" for="updateAddress">Address</label>
-                    <textarea id="updateAddress" class="supplier-form-input" placeholder="Address" rows="3"></textarea>
+            <form class="category-modal-body" id="updateCategoryForm">
+                <div class="category-form-group">
+                    <label class="category-form-label" for="updateCategoryName">Category Name</label>
+                    <input type="text" id="updateCategoryName" class="category-form-input" placeholder="Category Name" required>
                 </div>
             </form>
-            <div class="supplier-modal-footer">
-                <button type="button" class="btn-modal-close" id="closeUpdateSupplierBtn">Close</button>
-                <button type="submit" form="updateSupplierForm" class="btn-modal-update">Update</button>
+            <div class="category-modal-footer">
+                <button type="button" class="btn-modal-close" id="closeUpdateCategoryBtn">Close</button>
+                <button type="submit" form="updateCategoryForm" class="btn-modal-update">Update</button>
             </div>
         </div>
     </div>
 
     <script>
-        var supplierData = {
-            '1': { name: 'Supplier One', company: 'Supplier One Ltd', email: 'supplier@pos.com', phone: '3030202', address: 'Supplier address' },
-            '2': { name: 'Supplier Two', company: 'ABC Trading Co.', email: 'abc.trading@email.com', phone: '0912345678', address: '123 Nguyen Hue, Q1, HCM' },
-            '3': { name: 'Supplier Three', company: 'Global Supplies JSC', email: 'global@supplies.vn', phone: '0987654321', address: '45 Le Loi, District 3, HCM' },
-            '4': { name: 'Supplier Four', company: 'Fast Goods Distribution', email: 'contact@fastgoods.com', phone: '02838291234', address: '78 Tran Hung Dao, Q5, HCM' }
+        var categoryData = {
+            '1': { name: 'Clothing' },
+            '2': { name: 'Drinks' },
+            '3': { name: 'Food' },
+            '4': { name: 'Stationery' }
         };
 
-        document.getElementById('openAddSupplierModal').addEventListener('click', function (e) {
+        document.getElementById('openAddCategoryModal').addEventListener('click', function (e) {
             e.preventDefault();
-            document.getElementById('addSupplierName').value = '';
-            document.getElementById('addCompanyName').value = '';
-            document.getElementById('addSupplierEmail').value = '';
-            document.getElementById('addSupplierPhone').value = '';
-            document.getElementById('addSupplierAddress').value = '';
-            document.getElementById('addSupplierOverlay').classList.add('is-open');
+            document.getElementById('addCategoryName').value = '';
+            document.getElementById('addCategoryOverlay').classList.add('is-open');
             document.body.style.overflow = 'hidden';
         });
 
-        function closeAddSupplierModal() {
-            document.getElementById('addSupplierOverlay').classList.remove('is-open');
+        function closeAddCategoryModal() {
+            document.getElementById('addCategoryOverlay').classList.remove('is-open');
             document.body.style.overflow = '';
         }
-        document.getElementById('closeAddSupplierModal').addEventListener('click', closeAddSupplierModal);
-        document.getElementById('closeAddSupplierBtn').addEventListener('click', closeAddSupplierModal);
-        document.getElementById('addSupplierOverlay').addEventListener('click', function (e) {
-            if (e.target === document.getElementById('addSupplierOverlay')) closeAddSupplierModal();
+        document.getElementById('closeAddCategoryModal').addEventListener('click', closeAddCategoryModal);
+        document.getElementById('closeAddCategoryBtn').addEventListener('click', closeAddCategoryModal);
+        document.getElementById('addCategoryOverlay').addEventListener('click', function (e) {
+            if (e.target === document.getElementById('addCategoryOverlay')) closeAddCategoryModal();
         });
-        document.getElementById('addSupplierForm').addEventListener('submit', function (e) {
+        document.getElementById('addCategoryForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            closeAddSupplierModal();
+            closeAddCategoryModal();
         });
 
-        document.querySelectorAll('.open-update-supplier').forEach(function (btn) {
+        document.querySelectorAll('.open-update-category').forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
-                var id = this.getAttribute('data-supplier-id');
-                var s = supplierData[id];
-                if (!s) return;
-                document.getElementById('updateSupplierName').value = s.name;
-                document.getElementById('updateCompany').value = s.company;
-                document.getElementById('updateEmail').value = s.email;
-                document.getElementById('updatePhone').value = s.phone;
-                document.getElementById('updateAddress').value = s.address;
-                document.getElementById('updateSupplierOverlay').classList.add('is-open');
+                var id = this.getAttribute('data-category-id');
+                var c = categoryData[id];
+                if (!c) return;
+                document.getElementById('updateCategoryName').value = c.name;
+                document.getElementById('updateCategoryOverlay').classList.add('is-open');
                 document.body.style.overflow = 'hidden';
             });
         });
 
-        function closeUpdateSupplierModal() {
-            document.getElementById('updateSupplierOverlay').classList.remove('is-open');
+        function closeUpdateCategoryModal() {
+            document.getElementById('updateCategoryOverlay').classList.remove('is-open');
             document.body.style.overflow = '';
         }
-        document.getElementById('closeUpdateSupplierModal').addEventListener('click', closeUpdateSupplierModal);
-        document.getElementById('closeUpdateSupplierBtn').addEventListener('click', closeUpdateSupplierModal);
-        document.getElementById('updateSupplierOverlay').addEventListener('click', function (e) {
-            if (e.target === document.getElementById('updateSupplierOverlay')) closeUpdateSupplierModal();
+        document.getElementById('closeUpdateCategoryModal').addEventListener('click', closeUpdateCategoryModal);
+        document.getElementById('closeUpdateCategoryBtn').addEventListener('click', closeUpdateCategoryModal);
+        document.getElementById('updateCategoryOverlay').addEventListener('click', function (e) {
+            if (e.target === document.getElementById('updateCategoryOverlay')) closeUpdateCategoryModal();
         });
-        document.getElementById('updateSupplierForm').addEventListener('submit', function (e) {
+        document.getElementById('updateCategoryForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            closeUpdateSupplierModal();
+            closeUpdateCategoryModal();
         });
     </script>
 </body>

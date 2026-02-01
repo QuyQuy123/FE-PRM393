@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders List - POS System</title>
+    <title>Expiration Notification - POS System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -99,7 +99,7 @@
         }
         .header-right { display: flex; align-items: center; gap: 1.25rem; }
         .time-badge {
-            background: #0d9488;
+            background: #38bdf8;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 8px;
@@ -119,14 +119,51 @@
         .user-details .role { color: #6b7280; font-size: 0.8rem; margin-top: 1px; }
 
         .content { padding: 2rem; flex: 1; overflow-y: auto; }
-        .content-title {
-            font-size: 1.5rem;
+        .page-title {
+            font-size: 1.75rem;
             font-weight: 700;
-            color: #1a1d21;
+            color: #92400e;
             letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
             margin-bottom: 1.75rem;
         }
-
+        .summary-card {
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .summary-card.today { background: #f472b6; }
+        .summary-card.week { background: #fb7185; }
+        .summary-card.month3 { background: #facc15; color: #1a1d21; }
+        .summary-card.month6 { background: #7dd3fc; }
+        .summary-card-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .summary-card.month3 .summary-card-icon { background: rgba(0, 0, 0, 0.15); }
+        .summary-card-label { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .summary-card-value { font-size: 1.5rem; font-weight: 700; }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
         .table-container {
             background: #fff;
             border-radius: 12px;
@@ -137,7 +174,7 @@
         .table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: auto;
+            table-layout: fixed;
         }
         .table th,
         .table td {
@@ -153,23 +190,20 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
-        .table td {
-            color: #374151;
-        }
+        .table td { color: #374151; }
         .table tbody tr:hover { background: #f7f8fa; }
-
-        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; min-width: 6rem; }
-        .table th:nth-child(2), .table td:nth-child(2) { text-align: left; min-width: 10rem; }
-        .table th:nth-child(3), .table td:nth-child(3) { text-align: left; min-width: 10rem; }
-        .table th:nth-child(4), .table td:nth-child(4) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; min-width: 4rem; }
-        .table th:nth-child(6), .table td:nth-child(6) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(7), .table td:nth-child(7) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(8), .table td:nth-child(8) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(9), .table td:nth-child(9) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(10), .table td:nth-child(10) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(11), .table td:nth-child(11) { text-align: center; min-width: 5rem; }
-
+        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; }
+        .table th:nth-child(2), .table td:nth-child(2) { text-align: right; }
+        .table th:nth-child(3), .table td:nth-child(3) { text-align: left; }
+        .table th:nth-child(4), .table td:nth-child(4) { text-align: left; }
+        .table th:nth-child(5), .table td:nth-child(5) { text-align: left; }
+        .table th:nth-child(6), .table td:nth-child(6) { text-align: center; }
+        .no-records {
+            padding: 2rem;
+            text-align: center;
+            color: #b91c1c;
+            font-weight: 600;
+        }
         .status-badge {
             padding: 0.25rem 0.6rem;
             border-radius: 20px;
@@ -177,15 +211,48 @@
             font-weight: 600;
             display: inline-block;
         }
-        .status-paid { background: #d1fae5; color: #065f46; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-cancelled { background: #fee2e2; color: #991b1b; }
+        .status-expired { background: #fee2e2; color: #991b1b; }
+        .status-soon { background: #fef3c7; color: #92400e; }
+        .status-ok { background: #d1fae5; color: #065f46; }
+        .btn-action {
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-action:hover { opacity: 0.9; }
+        .btn-delete {
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            background: #dc2626;
+            color: white;
+        }
+        .btn-delete:hover { background: #b91c1c; }
+        .action-buttons { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
 
+        @media (max-width: 1024px) {
+            .summary-cards { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (max-width: 768px) {
             .sidebar { width: 240px; }
             .main-content { margin-left: 0; }
             .header { padding: 1rem; }
             .content { padding: 1rem; }
+            .summary-cards { grid-template-columns: 1fr; }
             .table-container { overflow-x: auto; }
         }
     </style>
@@ -199,16 +266,12 @@
         <div class="sidebar-content">
             <ul class="sidebar-menu">
                 <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
-                <li><a href="../user/users.html">Users</a></li>
-                <li><a href="../customer/ListCustomer.html">Customer</a></li>
-                <li><a href="../discount/Discount.html">Discount</a></li>
                 <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
                 <li><a href="../category/ListCategory.html">Category</a></li>
                 <li><a href="../product/ListProduct.html">Products</a></li>
-                <li><a href="../barcodeScanner/BarcodeScanner.html">Barcode Scanner</a></li>
-                <li><a href="ViewAllOrder.html" class="active">Orders</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
                 <li><a href="../creditors/Creditors.html">Creditors</a></li>
-                <li><a href="../expired/Expired.html">Expired</a></li>
+                <li><a href="Expired.html" class="active">Expired</a></li>
                 <li><a href="../report/report.html">Reports</a></li>
             </ul>
             <div class="sidebar-footer">
@@ -220,7 +283,7 @@
     <div class="main-content">
         <div class="header">
             <div class="header-right">
-                <div class="time-badge">11:17:23 AM</div>
+                <div class="time-badge">11:17:29 AM</div>
                 <div class="user-info">
                     <div class="user-details">
                         <div class="name">kodemade</div>
@@ -232,77 +295,92 @@
         </div>
 
         <div class="content">
-            <h1 class="content-title">Orders List</h1>
+            <h1 class="page-title">Expiration Notification</h1>
+
+            <div class="summary-cards">
+                <div class="summary-card today">
+                    <div class="summary-card-icon">🛒</div>
+                    <div>
+                        <div class="summary-card-label">Expires Today</div>
+                        <div class="summary-card-value">0</div>
+                    </div>
+                </div>
+                <div class="summary-card week">
+                    <div class="summary-card-icon">⭐</div>
+                    <div>
+                        <div class="summary-card-label">Expires in 7 Days</div>
+                        <div class="summary-card-value">0</div>
+                    </div>
+                </div>
+                <div class="summary-card month3">
+                    <div class="summary-card-icon">🔄</div>
+                    <div>
+                        <div class="summary-card-label">Expires In 3 Month Time</div>
+                        <div class="summary-card-value">0</div>
+                    </div>
+                </div>
+                <div class="summary-card month6">
+                    <div class="summary-card-icon">✓</div>
+                    <div>
+                        <div class="summary-card-label">Expires in 6 Month</div>
+                        <div class="summary-card-value">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Expiration Details</h2>
 
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Phone</th>
-                            <th>Total</th>
-                            <th>Discount (%)</th>
-                            <th>Payable</th>
-                            <th>Paid</th>
-                            <th>Payment</th>
+                            <th>Product</th>
+                            <th>Stock Qty</th>
+                            <th>Supplier</th>
+                            <th>Expiry Date</th>
                             <th>Status</th>
-                            <th>Cashier</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>ORD-001</td>
-                            <td>Nguyen Van A</td>
-                            <td>0901234567</td>
-                            <td>đ125,000</td>
-                            <td>5</td>
-                            <td>đ118,750</td>
-                            <td>đ118,750</td>
-                            <td>Card</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
-                            <td>John</td>
-                            <td><a href="ViewOrderDetail.html?id=1">View</a></td>
+                            <td>Biro</td>
+                            <td>200</td>
+                            <td>ABC Supplies</td>
+                            <td>02/04/2025</td>
+                            <td><span class="status-badge status-soon">Soon</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="../product/ViewProductDetail.html?id=1" class="btn-action">View</a>
+                                    <a href="#" class="btn-delete">Delete</a>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td>ORD-002</td>
-                            <td>Tran Thi B</td>
-                            <td>0987463212</td>
-                            <td>đ85,400</td>
-                            <td>0</td>
-                            <td>đ85,400</td>
-                            <td>đ85,400</td>
-                            <td>Cash</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
-                            <td>Jane</td>
-                            <td><a href="ViewOrderDetail.html?id=2">View</a></td>
+                            <td>Exercise Book</td>
+                            <td>300</td>
+                            <td>Global Traders</td>
+                            <td>03/04/2025</td>
+                            <td><span class="status-badge status-soon">Soon</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="../product/ViewProductDetail.html?id=2" class="btn-action">View</a>
+                                    <a href="#" class="btn-delete">Delete</a>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td>ORD-003</td>
-                            <td>Le Van C</td>
-                            <td>0912345678</td>
-                            <td>đ250,000</td>
-                            <td>10</td>
-                            <td>đ189,000</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td><span class="status-badge status-pending">Pending</span></td>
-                            <td>John</td>
-                            <td><a href="ViewOrderDetail.html?id=3">View</a></td>
-                        </tr>
-                        <tr>
-                            <td>ORD-004</td>
-                            <td>Pham Thi D</td>
-                            <td>0923456789</td>
-                            <td>đ45,200</td>
-                            <td>3</td>
-                            <td>đ43,844</td>
-                            <td>đ43,844</td>
-                            <td>Transfer</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
-                            <td>Jane</td>
-                            <td><a href="ViewOrderDetail.html?id=4">View</a></td>
+                            <td>Colored Chalk</td>
+                            <td>200</td>
+                            <td>Prime Distributors</td>
+                            <td>05/04/2025</td>
+                            <td><span class="status-badge status-ok">OK</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="../product/ViewProductDetail.html?id=4" class="btn-action">View</a>
+                                    <a href="#" class="btn-delete">Delete</a>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

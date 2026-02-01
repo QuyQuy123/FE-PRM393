@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Invoice - POS System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: #fff;
+            color: #1a1d21;
+            padding: 2rem;
+            max-width: 480px;
+            margin: 0 auto;
+            font-size: 0.9rem;
+        }
+        .invoice {
+            border: 1px solid #e5e7eb;
+            padding: 2rem;
+            background: #fff;
+        }
+        .logo-box {
+            background: #1f2937;
+            color: white;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .company-name {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .company-info {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #4b5563;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        .invoice-title {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.02em;
+        }
+        .details-table {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        .details-table tr td:first-child {
+            font-weight: 600;
+            color: #374151;
+            padding: 0.25rem 0;
+            width: 40%;
+        }
+        .details-table tr td:last-child {
+            padding: 0.25rem 0;
+        }
+        .dotted-line {
+            border-bottom: 1px dotted #9ca3af;
+            margin: 0.5rem 0 1rem;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .items-table th {
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px dotted #9ca3af;
+        }
+        .items-table th:nth-child(1) { width: 55%; }
+        .items-table th:nth-child(2) { width: 15%; text-align: center; }
+        .items-table th:nth-child(3) { width: 30%; text-align: right; }
+        .items-table td {
+            padding: 0.4rem 0;
+            border-bottom: 1px dotted #9ca3af;
+        }
+        .items-table td:nth-child(2) { text-align: center; }
+        .items-table td:nth-child(3) { text-align: right; font-weight: 500; }
+        .item-name { font-weight: 500; }
+        .item-unit-price { font-size: 0.8rem; color: #6b7280; margin-top: 0.2rem; }
+        .summary-table {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .summary-table tr td:first-child {
+            font-weight: 600;
+            padding: 0.35rem 0;
+            color: #374151;
+        }
+        .summary-table tr td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+        .total-double-line {
+            border-top: 2px solid #1a1d21;
+            border-bottom: 2px solid #1a1d21;
+            padding: 0.5rem 0 !important;
+        }
+        .qr-wrap {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        .qr-wrap img {
+            width: 120px;
+            height: 120px;
+            display: inline-block;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+        }
+        .footer-copy {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 1rem;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background: #374151;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .btn-back:hover { background: #1f2937; }
+    </style>
+</head>
+<body>
+    <a href="BarcodeScanner.html" class="btn-back">← Back to POS</a>
+
+    <div class="invoice">
+        <div class="logo-box">KODEMADEEAZY</div>
+        <div class="company-name">SUPERMARKET POS S </div>
+        <div class="company-info">
+            Sample Address<br>
+            Tel: 010101010<br>
+            Email: kodemade@pos.com
+        </div>
+
+        <div class="invoice-title">SALES INVOICE</div>
+
+        <table class="details-table">
+            <tr><td>SALES POINT:</td><td id="salesPoint">Store One</td></tr>
+            <tr><td>CASHIER:</td><td id="cashier">Smith</td></tr>
+            <tr><td>INVOICE NO:</td><td id="invoiceNo">INV-0000001</td></tr>
+            <tr><td>CUSTOMER:</td><td id="customer">Guest</td></tr>
+            <tr><td>DATE:</td><td id="invoiceDate">July 12th, 2023</td></tr>
+            <tr><td>TIME:</td><td id="invoiceTime">11:19:36 AM</td></tr>
+        </table>
+        <div class="dotted-line"></div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>ITEM</th>
+                    <th>QTY</th>
+                    <th>AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+        </table>
+        <div class="dotted-line"></div>
+
+        <table class="summary-table">
+            <tr><td>TOTAL</td><td id="total" class="total-double-line">0đ</td></tr>
+            <tr><td id="discountLabel">DISCOUNT (0%):</td><td id="discountAmount">0đ</td></tr>
+            <tr><td>PAYABLE</td><td id="payable">0đ</td></tr>
+            <tr><td>PAID</td><td id="paid">0đ</td></tr>
+            <tr><td>BALANCE</td><td id="balance">0đ</td></tr>
+            <tr><td>PAID VIA</td><td id="paidVia">—</td></tr>
+        </table>
+
+        <div class="qr-wrap">
+            <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=INV-0000001" alt="QR Code">
+        </div>
+        <div class="footer-copy">Copyright © 2023 KODE MADE EAZY POS</div>
+    </div>
+
+    <script>
+        (function () {
+            var STORAGE_KEY = 'pos_invoice_data';
+            var data = sessionStorage.getItem(STORAGE_KEY);
+            var inv = data ? JSON.parse(data) : null;
+            sessionStorage.removeItem(STORAGE_KEY);
+
+            var salesPoint = 'Store One';
+            var cashier = 'Smith';
+            var invoiceNo = 'INV-0000001';
+            var customer = 'Guest';
+            var invoiceDate = 'July 12th, 2023';
+            var invoiceTime = '11:19:36 AM';
+            var items = [
+                { name: 'Indomie', qty: 5, amount: 1500 },
+                { name: 'Biro', qty: 5, amount: 3750 }
+            ];
+            var total = 5250;
+            var discountPercent = 5;
+            var discountAmount = 262.5;
+            var payable = 4987.5;
+            var paid = 3987.5;
+            var balance = 1000;
+            var paidVia = 'POS';
+
+            if (inv) {
+                salesPoint = inv.salesPoint || salesPoint;
+                cashier = inv.cashier || cashier;
+                invoiceNo = inv.invoiceNo || invoiceNo;
+                customer = inv.customer || customer;
+                invoiceDate = inv.date || invoiceDate;
+                invoiceTime = inv.time || invoiceTime;
+                items = inv.items || items;
+                total = inv.total != null ? inv.total : total;
+                discountPercent = inv.discountPercent != null ? inv.discountPercent : discountPercent;
+                discountAmount = inv.discountAmount != null ? inv.discountAmount : discountAmount;
+                payable = inv.payable != null ? inv.payable : payable;
+                paid = inv.paid != null ? inv.paid : paid;
+                balance = inv.balance != null ? inv.balance : balance;
+                paidVia = inv.paidVia || paidVia;
+            }
+
+            function fmt(num) {
+                return (num || 0).toLocaleString('vi-VN') + 'đ';
+            }
+
+            document.getElementById('salesPoint').textContent = salesPoint;
+            document.getElementById('cashier').textContent = cashier;
+            document.getElementById('invoiceNo').textContent = invoiceNo;
+            document.getElementById('customer').textContent = customer;
+            document.getElementById('invoiceDate').textContent = invoiceDate;
+            document.getElementById('invoiceTime').textContent = invoiceTime;
+
+            var tbody = document.getElementById('itemsBody');
+            tbody.innerHTML = items.map(function (it) {
+                var qty = it.qty || 1;
+                var unitPrice = it.unitPrice != null ? it.unitPrice : (it.amount / qty);
+                return '<tr><td><div class="item-name">' + (it.name || it.item) + '</div><div class="item-unit-price">Đơn giá: ' + fmt(unitPrice) + '</div></td><td>' + qty + '</td><td>' + fmt(it.amount) + '</td></tr>';
+            }).join('');
+
+            document.getElementById('total').textContent = fmt(total);
+            document.getElementById('discountLabel').textContent = 'DISCOUNT (' + (discountPercent || 0) + '%):';
+            document.getElementById('discountAmount').textContent = fmt(discountAmount);
+            document.getElementById('payable').textContent = fmt(payable);
+            document.getElementById('paid').textContent = fmt(paid);
+            document.getElementById('balance').textContent = fmt(balance);
+            document.getElementById('paidVia').textContent = paidVia || '—';
+
+            document.getElementById('qrImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=' + encodeURIComponent(invoiceNo);
+        })();
+    </script>
+</body>
+</html>

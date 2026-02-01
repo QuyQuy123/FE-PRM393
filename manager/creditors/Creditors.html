@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders List - POS System</title>
+    <title>Credit Sales Records - POS System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -99,7 +99,7 @@
         }
         .header-right { display: flex; align-items: center; gap: 1.25rem; }
         .time-badge {
-            background: #0d9488;
+            background: #16a34a;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 8px;
@@ -109,8 +109,8 @@
         .user-info { display: flex; align-items: center; gap: 0.75rem; }
         .user-avatar {
             width: 40px; height: 40px;
-            background: #1e293b;
-            border-radius: 10px;
+            background: #d97706;
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: white; font-weight: 600; font-size: 0.9rem;
         }
@@ -153,33 +153,26 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
-        .table td {
-            color: #374151;
-        }
+        .table td { color: #374151; }
         .table tbody tr:hover { background: #f7f8fa; }
 
-        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; min-width: 6rem; }
+        .table th:nth-child(1), .table td:nth-child(1) { text-align: left; min-width: 7rem; }
         .table th:nth-child(2), .table td:nth-child(2) { text-align: left; min-width: 10rem; }
         .table th:nth-child(3), .table td:nth-child(3) { text-align: left; min-width: 10rem; }
-        .table th:nth-child(4), .table td:nth-child(4) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; min-width: 4rem; }
-        .table th:nth-child(6), .table td:nth-child(6) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(7), .table td:nth-child(7) { text-align: right; min-width: 5rem; }
-        .table th:nth-child(8), .table td:nth-child(8) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(9), .table td:nth-child(9) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(10), .table td:nth-child(10) { text-align: left; min-width: 5rem; }
-        .table th:nth-child(11), .table td:nth-child(11) { text-align: center; min-width: 5rem; }
+        .table th:nth-child(4), .table td:nth-child(4) { text-align: right; min-width: 6rem; }
+        .table th:nth-child(5), .table td:nth-child(5) { text-align: right; min-width: 6rem; }
+        .table th:nth-child(6), .table td:nth-child(6) { text-align: right; min-width: 6rem; }
+        .table th:nth-child(7), .table td:nth-child(7) { text-align: left; min-width: 5rem; }
+        .table th:nth-child(8), .table td:nth-child(8) { text-align: center; min-width: 8rem; }
+        .table th:nth-child(9), .table td:nth-child(9) { text-align: center; min-width: 8rem; }
 
-        .status-badge {
-            padding: 0.25rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.72rem;
+        .no-records {
+            padding: 2rem;
+            text-align: center;
+            color: #b91c1c;
             font-weight: 600;
-            display: inline-block;
+            font-size: 0.95rem;
         }
-        .status-paid { background: #d1fae5; color: #065f46; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-cancelled { background: #fee2e2; color: #991b1b; }
 
         @media (max-width: 768px) {
             .sidebar { width: 240px; }
@@ -199,15 +192,11 @@
         <div class="sidebar-content">
             <ul class="sidebar-menu">
                 <li><a href="../dashboard/dashboard.html">Dashboard</a></li>
-                <li><a href="../user/users.html">Users</a></li>
-                <li><a href="../customer/ListCustomer.html">Customer</a></li>
-                <li><a href="../discount/Discount.html">Discount</a></li>
                 <li><a href="../supplier/ListSupplier.html">Suppliers</a></li>
                 <li><a href="../category/ListCategory.html">Category</a></li>
                 <li><a href="../product/ListProduct.html">Products</a></li>
-                <li><a href="../barcodeScanner/BarcodeScanner.html">Barcode Scanner</a></li>
-                <li><a href="ViewAllOrder.html" class="active">Orders</a></li>
-                <li><a href="../creditors/Creditors.html">Creditors</a></li>
+                <li><a href="../orders/ViewAllOrder.html">Orders</a></li>
+                <li><a href="Creditors.html" class="active">Creditors</a></li>
                 <li><a href="../expired/Expired.html">Expired</a></li>
                 <li><a href="../report/report.html">Reports</a></li>
             </ul>
@@ -220,89 +209,90 @@
     <div class="main-content">
         <div class="header">
             <div class="header-right">
-                <div class="time-badge">11:17:23 AM</div>
+                <div class="time-badge">11:17:26 AM</div>
                 <div class="user-info">
                     <div class="user-details">
                         <div class="name">kodemade</div>
                         <div class="role">Administrator</div>
                     </div>
-                    <div class="user-avatar">K</div>
+                    <div class="user-avatar">D</div>
                 </div>
             </div>
         </div>
 
         <div class="content">
-            <h1 class="content-title">Orders List</h1>
+            <h1 class="content-title">Credit Sales Records</h1>
 
             <div class="table-container">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
+                            <th>Invoice No</th>
+                            <th>Customer Name</th>
                             <th>Phone</th>
                             <th>Total</th>
-                            <th>Discount (%)</th>
-                            <th>Payable</th>
                             <th>Paid</th>
-                            <th>Payment</th>
-                            <th>Status</th>
+                            <th>Balance</th>
                             <th>Cashier</th>
-                            <th>Action</th>
+                            <th>Date</th>
+                            <th>Pay Due</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>ORD-001</td>
+                            <td>INV-2025-001</td>
                             <td>Nguyen Van A</td>
                             <td>0901234567</td>
-                            <td>đ125,000</td>
-                            <td>5</td>
-                            <td>đ118,750</td>
-                            <td>đ118,750</td>
-                            <td>Card</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>đ250,000</td>
+                            <td>đ150,000</td>
+                            <td>đ100,000</td>
                             <td>John</td>
-                            <td><a href="ViewOrderDetail.html?id=1">View</a></td>
+                            <td>02/01/2025</td>
+                            <td>15/01/2025</td>
                         </tr>
                         <tr>
-                            <td>ORD-002</td>
+                            <td>INV-2025-002</td>
                             <td>Tran Thi B</td>
-                            <td>0987463212</td>
-                            <td>đ85,400</td>
-                            <td>0</td>
-                            <td>đ85,400</td>
-                            <td>đ85,400</td>
-                            <td>Cash</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>0123456789</td>
+                            <td>đ420,000</td>
+                            <td>đ200,000</td>
+                            <td>đ220,000</td>
                             <td>Jane</td>
-                            <td><a href="ViewOrderDetail.html?id=2">View</a></td>
+                            <td>05/01/2025</td>
+                            <td>20/01/2025</td>
                         </tr>
                         <tr>
-                            <td>ORD-003</td>
+                            <td>INV-2025-003</td>
                             <td>Le Van C</td>
                             <td>0912345678</td>
-                            <td>đ250,000</td>
-                            <td>10</td>
-                            <td>đ189,000</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>đ185,000</td>
+                            <td>đ85,000</td>
+                            <td>đ100,000</td>
                             <td>John</td>
-                            <td><a href="ViewOrderDetail.html?id=3">View</a></td>
+                            <td>08/01/2025</td>
+                            <td>22/01/2025</td>
                         </tr>
                         <tr>
-                            <td>ORD-004</td>
+                            <td>INV-2025-004</td>
                             <td>Pham Thi D</td>
                             <td>0923456789</td>
-                            <td>đ45,200</td>
-                            <td>3</td>
-                            <td>đ43,844</td>
-                            <td>đ43,844</td>
-                            <td>Transfer</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>đ560,000</td>
+                            <td>đ300,000</td>
+                            <td>đ260,000</td>
                             <td>Jane</td>
-                            <td><a href="ViewOrderDetail.html?id=4">View</a></td>
+                            <td>10/01/2025</td>
+                            <td>25/01/2025</td>
+                        </tr>
+                        <tr>
+                            <td>INV-2025-005</td>
+                            <td>Hoang Van E</td>
+                            <td>0989149426</td>
+                            <td>đ310,000</td>
+                            <td>đ110,000</td>
+                            <td>đ200,000</td>
+                            <td>John</td>
+                            <td>12/01/2025</td>
+                            <td>28/01/2025</td>
                         </tr>
                     </tbody>
                 </table>
