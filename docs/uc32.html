@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC32 - Scan Product</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            color: #1a1d21;
+            line-height: 1.5;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: #1a1d21;
+        }
+        .meta {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+        .meta p { margin: 0.25rem 0; }
+        .meta strong { color: #374151; }
+        .code-ref {
+            font-size: 0.85rem;
+            color: #0d9488;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            font-size: 1.15rem;
+            color: #374151;
+            margin: 2rem 0 0.75rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        p, ul { margin-bottom: 0.75rem; }
+        ul { padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0 1.5rem;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        th, td {
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.85rem;
+        }
+        td { font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        code {
+            background: #f3f4f6;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .footer-note {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+        .table-caption {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Use Case: Scan Product (UC32)</h1>
+    <div class="meta">
+        <p><strong>Use Case ID:</strong> UC32</p>
+        <p><strong>Use Case Name:</strong> Scan Product</p>
+        <p><strong>Author:</strong> QuyNV</p>
+        <p><strong>Version:</strong> 1.0</p>
+        <p><strong>Date:</strong> 31/1/2026</p>
+        <p><strong>Actor:</strong> Cashier</p>
+    </div>
+    <p class="code-ref">Aligned with code: <code>casher/barcodeScanner/BarcodeScanner.html</code></p>
+
+    <h2>Description</h2>
+    <p>Allows the Cashier to scan or enter product barcodes (or search by name/code) to add items to the sales cart. The system looks up the product by barcode, adds it to the cart with quantity 1 (or increments existing line), updates the cart table and grand total. The cashier can also search products by name or barcode and select from the list to add to cart.</p>
+
+    <h2>Precondition</h2>
+    <ul>
+        <li><strong>PRE-01:</strong> The Cashier is logged in and has opened a shift (Open Shift completed).</li>
+        <li><strong>PRE-02:</strong> The Cashier is on the Barcode Scanner (POS) screen.</li>
+    </ul>
+
+    <h2>Trigger</h2>
+    <p><strong>TRG-01:</strong> The cashier scans a product barcode with a scanner (keyboard wedge) or enters barcode in the input field, or searches for a product by name/code and selects it.</p>
+
+    <h2>Post-Condition</h2>
+    <ul>
+        <li><strong>POS-01:</strong> The product is added to the cart (new line with qty 1 or existing line qty incremented).</li>
+        <li><strong>POS-02:</strong> The cart table and Grand Total are updated.</li>
+        <li><strong>POS-03:</strong> The barcode input is cleared (when adding by barcode).</li>
+    </ul>
+
+    <h2>Main flows</h2>
+    <table>
+        <thead>
+            <tr><th>Step</th><th>Actor</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Cashier</td><td>Accesses the Barcode Scanner screen (main POS).</td></tr>
+            <tr><td>2</td><td>SMS</td><td>Displays the form: Customer Name, Phone (optional), barcode input ("Scan or enter barcode..."), "Scan product barcode" button, "+ Add To Cart" button, "Search product" input, "View search page" link; cart table (Product Name, Stock Qty, Unit Price, Qty, Subtotal, Remove); Grand Total; discount and payment section.</td></tr>
+            <tr><td>3</td><td>Cashier</td><td>Scans barcode (keyboard wedge fills barcode input) or types barcode in the barcode input field.</td></tr>
+            <tr><td>4</td><td>Cashier</td><td>Presses Enter or clicks "+ Add To Cart" (or clicks "Scan product barcode" to focus the barcode field then scans).</td></tr>
+            <tr><td>5</td><td>SMS</td><td>Looks up product by barcode in the product catalog. If found: adds to cart (qty 1 or increments existing line), clears barcode input, re-renders cart and Grand Total. If not found: no change (barcode input remains).</td></tr>
+            <tr><td>6</td><td>SMS</td><td>Cart table shows: Product Name, Stock Qty, Unit Price, Qty (with − / + controls), Subtotal, Remove button. Grand Total is updated.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Alternative flows</h2>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>At step</th><th>Condition</th><th>Actor</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>AT1</td><td>Step 3–4</td><td>Search by name/code instead of barcode</td><td>Cashier</td><td>Types in "Search product" field; system shows matching products in a dropdown; cashier selects one; product is added to cart (qty 1 or incremented) and search input is cleared.</td></tr>
+            <tr><td>AT2</td><td>Step 5</td><td>Barcode not found</td><td>SMS</td><td>Product not in catalog; no item added. Barcode input is cleared on submit; user can enter a different barcode.</td></tr>
+            <tr><td>AT3</td><td>Step 4</td><td>Barcode input empty when "+ Add To Cart" clicked</td><td>SMS</td><td>Focus is set to the barcode input; no cart change.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Business Rules</h2>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Rule</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>BR-01</td><td>Adding a product by barcode adds one unit; if the product is already in the cart, its quantity is incremented by 1.</td></tr>
+            <tr><td>BR-02</td><td>Cart lines show Product Name, Stock Qty, Unit Price, editable Qty (with − / +), Subtotal, and Remove. Grand Total is the sum of subtotals (before discount).</td></tr>
+            <tr><td>BR-03</td><td>Barcode input is cleared after a successful add (Enter or Add To Cart). Search product list is cleared after selection.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Form fields (per code)</h2>
+    <table>
+        <thead>
+            <tr><th>Label / Control</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Customer Name</td><td>Text (input)</td><td>Optional. Placeholder: "Optional [Required for credit sales]".</td></tr>
+            <tr><td>Phone</td><td>Text (input)</td><td>Optional. Placeholder: "Optional [Required for credit sales]".</td></tr>
+            <tr><td>Add customer for points</td><td>Button</td><td>Opens modal to add customer (phone, name, total amount from bill) for points.</td></tr>
+            <tr><td>+ Add To Cart</td><td>Button</td><td>Adds product identified by current barcode input to cart; if barcode empty, focuses barcode input.</td></tr>
+            <tr><td>Scan product barcode</td><td>Button</td><td>Focuses the barcode input so scanner (keyboard wedge) can fill it.</td></tr>
+            <tr><td>Barcode input</td><td>Text (input)</td><td>Placeholder: "Scan or enter barcode...". On Enter or Add To Cart: lookup by barcode and add to cart.</td></tr>
+            <tr><td>Search product</td><td>Text (input)</td><td>Placeholder: "Search by name or code...". Filters product list; selecting an item adds it to cart.</td></tr>
+            <tr><td>View search page</td><td>Link</td><td>Navigates to SearchProduct.html (optional query from search input).</td></tr>
+            <tr><td>Cart table</td><td>Table</td><td>Columns: Product Name, Stock Qty, Unit Price, Qty (− / +), Subtotal, Remove.</td></tr>
+            <tr><td>Grand Total</td><td>Text (read-only)</td><td>Sum of cart subtotals; updated when discount is applied.</td></tr>
+            <tr><td>Apply Discount</td><td>Button</td><td>Applies discount percentage to grand total.</td></tr>
+            <tr><td>Discount %</td><td>Number (input)</td><td>Placeholder: "discount e.g 4"; min 0, max 100.</td></tr>
+            <tr><td>Payment Method</td><td>Select</td><td>Options: Select..., Cash, Card, Transfer, POS.</td></tr>
+            <tr><td>Amount Tender</td><td>Text (input)</td><td>Placeholder: "Enter amount paid".</td></tr>
+            <tr><td>Generate Invoice</td><td>Button</td><td>Validates cart not empty; builds invoice data and redirects to invoice.html.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Screen Definition</h2>
+    <p class="table-caption">Table: Screen Definition</p>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Field Name</th>
+                <th>Type</th>
+                <th>Mandatory</th>
+                <th>Max Length</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Customer Name</td>
+                <td>Text (input)</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Optional. Placeholder: "Optional [Required for credit sales]".</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Phone</td>
+                <td>Text (input)</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Optional. Placeholder: "Optional [Required for credit sales]".</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Add customer for points</td>
+                <td>Button</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Opens modal to add customer for points (phone, name, total from bill).</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>+ Add To Cart</td>
+                <td>Button</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Adds product by current barcode input to cart; if empty, focuses barcode input.</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Scan product barcode</td>
+                <td>Button</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Focuses barcode input for scanner (keyboard wedge) input.</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Barcode input</td>
+                <td>Text (input)</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Placeholder: "Scan or enter barcode...". On Enter or Add To Cart: lookup and add to cart.</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Search product</td>
+                <td>Text (input)</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Placeholder: "Search by name or code...". Filters list; select item to add to cart.</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>View search page</td>
+                <td>Link</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Navigates to SearchProduct.html with optional query.</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Cart table</td>
+                <td>Table</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Product Name, Stock Qty, Unit Price, Qty (−/+), Subtotal, Remove.</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>Grand Total</td>
+                <td>Text (read-only)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Sum of subtotals; updated when discount applied.</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>Apply Discount</td>
+                <td>Button</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Applies discount percentage to grand total.</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>Discount %</td>
+                <td>Number (input)</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Placeholder: "discount e.g 4"; min 0, max 100.</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>Payment Method</td>
+                <td>Select</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Options: Select..., Cash, Card, Transfer, POS.</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>Amount Tender</td>
+                <td>Text (input)</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Placeholder: "Enter amount paid".</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>Generate Invoice</td>
+                <td>Button</td>
+                <td>—</td>
+                <td>—</td>
+                <td>If cart empty: alert "No products in cart."; else build invoice and redirect to invoice.html.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="footer-note">This document describes the current behaviour of BarcodeScanner.html (Scan Product screen); update the doc when the code changes.</p>
+</body>
+</html>

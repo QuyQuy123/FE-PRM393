@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC31 - Open Shift</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            color: #1a1d21;
+            line-height: 1.5;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: #1a1d21;
+        }
+        .meta {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+        .meta p { margin: 0.25rem 0; }
+        .meta strong { color: #374151; }
+        .code-ref {
+            font-size: 0.85rem;
+            color: #0d9488;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            font-size: 1.15rem;
+            color: #374151;
+            margin: 2rem 0 0.75rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        p, ul { margin-bottom: 0.75rem; }
+        ul { padding-left: 1.5rem; }
+        li { margin: 0.25rem 0; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0 1.5rem;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        th, td {
+            padding: 0.6rem 0.85rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.85rem;
+        }
+        td { font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        code {
+            background: #f3f4f6;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .footer-note {
+            margin-top: 2rem;
+            font-size: 0.85rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+        .table-caption {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Use Case: Open Shift (UC31)</h1>
+    <div class="meta">
+        <p><strong>Use Case ID:</strong> UC31</p>
+        <p><strong>Use Case Name:</strong> Open Shift</p>
+        <p><strong>Author:</strong> QuyNV</p>
+        <p><strong>Version:</strong> 1.0</p>
+        <p><strong>Date:</strong> 31/1/2026</p>
+        <p><strong>Actor:</strong> Cashier</p>
+    </div>
+    <p class="code-ref">Aligned with code: <code>casher/shift/OpenShiftScreen.html</code></p>
+
+    <h2>Description</h2>
+    <p>Allows the Cashier to declare the start of a working shift by confirming the initial cash amount in the drawer. The system records start time, employee name, and opening balance (in sessionStorage in current implementation) and then unlocks the POS terminal (Barcode Scanner screen) for sales.</p>
+
+    <h2>Precondition</h2>
+    <ul>
+        <li><strong>PRE-01:</strong> The Cashier is successfully logged into the system.</li>
+        <li><strong>PRE-02:</strong> There is no currently active or unclosed shift on the current device/account (when backend exists; current UI does not check this).</li>
+    </ul>
+
+    <h2>Trigger</h2>
+    <p><strong>TRG-01:</strong> The cashier accesses the Open Shift screen (e.g. after login or from navigation).</p>
+
+    <h2>Post-Condition</h2>
+    <ul>
+        <li><strong>POS-01:</strong> A new shift record is created (currently: <code>pos_open_shift_time</code>, <code>pos_initial_cash</code>, and optionally <code>pos_employee_name</code> in sessionStorage).</li>
+        <li><strong>POS-02:</strong> The system redirects to the main POS screen (Barcode Scanner).</li>
+    </ul>
+
+    <h2>Main flows</h2>
+    <table>
+        <thead>
+            <tr><th>Step</th><th>Actor</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Cashier</td><td>The cashier accesses the "Open Shift" screen.</td></tr>
+            <tr><td>2</td><td>SMS</td><td>The system displays the form with <strong>Employee name</strong> (read-only), <strong>Login time</strong> (read-only, local time), and <strong>Initial cash amount</strong> (input). Instruction: "Enter your opening cash amount to start your shift."</td></tr>
+            <tr><td>3</td><td>Cashier</td><td>Enters the actual amount of cash in the cash register in the "Initial cash amount" field. Placeholder: "Enter opening cash (e.g. 1000000)". Hint below field: "Total cash in drawer at the start of your shift."</td></tr>
+            <tr><td>4</td><td>Cashier</td><td>Presses the <strong>"Confirm &amp; start shift"</strong> button to confirm.</td></tr>
+            <tr><td>5</td><td>SMS</td><td>Validates the initial cash amount: must be numeric, non-empty (after trim), and ≥ 0.</td></tr>
+            <tr><td>6</td><td>SMS</td><td>Saves the start time (<code>pos_open_shift_time</code>), employee name from session (<code>pos_employee_name</code>), and initial cash amount (<code>pos_initial_cash</code>) to sessionStorage.</td></tr>
+            <tr><td>7</td><td>SMS</td><td>Redirects to the main POS screen (<code>../barcodeScanner/BarcodeScanner.html</code>).</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Alternative flows</h2>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>At step</th><th>Condition</th><th>Actor</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>AT1</td><td>Step 1</td><td>Shift already active</td><td>SMS</td><td>(When backend exists) Notify and redirect to POS screen. Current UI does not check this.</td></tr>
+            <tr><td>AT2</td><td>Step 5</td><td>Invalid amount</td><td>SMS</td><td>If value is empty, non-numeric, or negative: display error and return to Step 2.</td></tr>
+            <tr><td>AT2a</td><td>—</td><td>Empty or non-numeric</td><td>SMS</td><td>Message: <strong>"Please enter a valid initial cash amount."</strong> — focus on input field.</td></tr>
+            <tr><td>AT2b</td><td>—</td><td>Negative amount</td><td>SMS</td><td>Message: <strong>"Initial cash cannot be negative."</strong> — do not navigate away.</td></tr>
+            <tr><td>AT3</td><td>Step 6</td><td>Save error</td><td>SMS</td><td>Message: <strong>"Could not save. Please try again."</strong> — do not navigate away.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Business Rules</h2>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Rule</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>BR-01</td><td>Each staff member or POS terminal may have only one "Open" shift at a time (applies when backend exists).</td></tr>
+            <tr><td>BR-02</td><td>The <strong>Initial cash amount</strong> (Opening balance) field is mandatory and must be numeric and ≥ 0.</td></tr>
+            <tr><td>BR-03</td><td>Shift start time (Login time) is currently taken from the client (<code>new Date()</code>). When server exists, use server time for Shift Start Time.</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Form fields (per code)</h2>
+    <table>
+        <thead>
+            <tr><th>Label</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Employee name</td><td>Read-only</td><td>Displayed from <code>sessionStorage.pos_employee_name</code> or default "John Smith".</td></tr>
+            <tr><td>Login time</td><td>Read-only</td><td>Displays local time when page loads (<code>dateStyle: medium</code>, <code>timeStyle: medium</code>).</td></tr>
+            <tr><td>Initial cash amount</td><td>Input (text, inputmode=numeric)</td><td>Mandatory, numeric ≥ 0. Placeholder: "Enter opening cash (e.g. 1000000)".</td></tr>
+        </tbody>
+    </table>
+    <p><strong>Button:</strong> <strong>"Confirm &amp; start shift"</strong></p>
+
+    <h2>Screen Definition</h2>
+    <p class="table-caption">Table: Screen Definition</p>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Field Name</th>
+                <th>Type</th>
+                <th>Mandatory</th>
+                <th>Max Length</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Employee name</td>
+                <td>Text (read-only)</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Displayed from <code>sessionStorage.pos_employee_name</code> or default "John Smith".</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Login time</td>
+                <td>DateTime (read-only)</td>
+                <td>No</td>
+                <td>—</td>
+                <td>Local time when page loads; format: dateStyle medium, timeStyle medium.</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Initial cash amount</td>
+                <td>Number (input)</td>
+                <td>Yes</td>
+                <td>—</td>
+                <td>Opening balance in drawer; must be numeric and ≥ 0. Placeholder: "Enter opening cash (e.g. 1000000)".</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Confirm &amp; start shift</td>
+                <td>Button</td>
+                <td>—</td>
+                <td>—</td>
+                <td>Primary action button; submits the form, validates opening balance, saves to sessionStorage and redirects to Barcode Scanner.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="footer-note">This document describes the current behaviour of OpenShiftScreen.html; update the doc when the code changes.</p>
+</body>
+</html>
